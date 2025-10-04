@@ -16,9 +16,9 @@ def home(request):
     jour = request.GET.get('date')
     if not jour:
         jour = date.today().isoformat()  # format "2025-10-04"
-    bounds = [[6.2, 0.8], [12.5, 3.9]]  # Limites du Bénin
-    lieu = request.GET.get('lieu')
-    geolocator = Nominatim(user_agent="meteo_app")
+        bounds = [[6.2, 0.8], [12.5, 3.9]]  # Limites du Bénin
+        lieu = request.GET.get('lieu')
+        geolocator = Nominatim(user_agent="meteo_app")
 
     if lieu:
         location = geolocator.geocode(lieu)
@@ -46,7 +46,7 @@ def home(request):
 
     carte.add_child(folium.LatLngPopup())
 
-    carte_html = carte.repr_html()
+    carte_html = carte._repr_html_()
     return render(request, 'pages/index.html', {
         'message': message,
         'carte': carte_html,

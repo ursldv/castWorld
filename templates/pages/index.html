@@ -7,10 +7,134 @@
 {% endblock %}
 {% block content %}
 
-<div class="carte">
-  {{ carte|safe }}
-</div>
-<p class="text-center text-lg mt-4">{{ message }}</p>
+<div class="centent">
+  <div>
+    <div class="carte">
+      {{ carte|safe }}
+    </div>
+    <p class="text-center text-lg mt-4">{{ message }}</p>
+  </div>
+  <div class=" ">
+     <div
+    class="bg-[#409ac7] text-white rounded-2xl shadow-lg flex justify-between w-[100%]  p-3 ">
+
+    <!-- Bloc gauche (ville + météo actuelle) -->
+    <div class=" items-center space-x-4 px-6">
+      <img src="{% static 'img/imgmeteo/cloud.png' %}" alt="temp"
+        class="w-24 h-24 items-center">
+
+      <div class="flex space-between gap-6">
+        <div>
+          <p>Partly Cloudy</p>
+          <h2 class="text-2xl font-semibold">Cotonou, BJ</h2>
+
+        </div>
+        <h1 class="text-5xl font-bold mt-2">28°</h1>
+      </div>
+    </div>
+
+    <!-- Bloc droite (prévisions) -->
+    <div id="weather-scroll" class="overflow-hidden w-[500px] relative">
+      <div id="weather-cards" class="flex space-x-4 absolute">
+        <!-- Jour 1 -->
+        <div
+          class="bg-white text-gray-800 rounded-xl p-4 min-w-[150px] flex flex-col items-center shadow">
+          <p class="text-lg font-bold">12°</p>
+          <img src="{% static 'img/imgmeteo/wind.png' %}" alt="Sun"
+            class="w-10 h-10">
+          <p class="text-sm font-semibold mt-2">Tuesday</p>
+          <p class="text-xs text-gray-500">Sun</p>
+        </div>
+
+        <!-- Jour 2 -->
+        <div
+          class="bg-white text-gray-800 rounded-xl p-4 min-w-[150px] flex flex-col items-center shadow">
+          <p class="text-lg font-bold">14°</p>
+          <img src="{% static 'img/imgmeteo/cloudly.png' %}" alt="Cloudy"
+            class="w-10 h-10">
+          <p class="text-sm font-semibold mt-2">Wednesday</p>
+          <p class="text-xs text-gray-500">Wind</p>
+        </div>
+
+        <!-- Jour 3 -->
+        <div
+          class="bg-white text-gray-800 rounded-xl p-4 min-w-[150px] flex flex-col items-center shadow">
+          <p class="text-lg font-bold">18°</p>
+          <img src="{% static 'img/imgmeteo/rainy.png' %}" alt="Rain"
+            class="w-10 h-10">
+          <p class="text-sm font-semibold mt-2">Thursday</p>
+          <p class="text-xs text-gray-500">Rainy</p>
+        </div>
+
+        <!-- Jour 4 -->
+        <div
+          class="bg-white text-gray-800 rounded-xl p-4 min-w-[150px] flex flex-col items-center shadow">
+          <p class="text-lg font-bold">20°</p>
+          <img src="{% static 'img/imgmeteo/sun.png' %}" alt="Sun"
+            class="w-10 h-10">
+          <p class="text-sm font-semibold mt-2">Friday</p>
+        </div>
+
+        <!-- Jour 4 -->
+        <div
+          class="bg-white text-gray-800 rounded-xl p-4 min-w-[150px] flex flex-col items-center shadow">
+          <p class="text-lg font-bold">20°</p>
+          <img src="{% static 'img/imgmeteo/sun.png' %}" alt="Sun"
+            class="w-10 h-10">
+          <p class="text-sm font-semibold mt-2">Saturday</p>
+        </div>
+
+        <!-- Dupliquer pour le défilement infini -->
+        <div
+          class="bg-white text-gray-800 rounded-xl p-4 min-w-[150px] flex flex-col items-center shadow">
+          <p class="text-lg font-bold">12°</p>
+          <img src="{% static 'img/imgmeteo/wind.png' %}" alt="Sun"
+            class="w-10 h-10">
+          <p class="text-sm font-semibold mt-2">Sunday</p>
+          <p class="text-xs text-gray-500">Sun</p>
+        </div>
+        <!-- … et ainsi de suite pour chaque carte dupliquée -->
+      </div>
+
+    </div>
+  </div>
+  </div>
+ 
+
+<!-- CONTENEUR DASHBOARD EN DESSOUS -->
+<div class="mt-8 p-6 bg-gray-100 rounded-2xl shadow ">
+
+  <h2 class="text-xl font-semibold mb-4 text-gray-800">Dashboard Météo</h2>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+    <!-- Température -->
+    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
+      <i class="fas fa-temperature-high text-3xl text-red-500 mb-2"></i>
+      <p class="text-gray-500 text-sm">Température</p>
+      <h3 class="text-2xl font-bold">28°</h3>
+    </div>
+
+    <!-- Humidité -->
+    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
+      <i class="fas fa-tint text-3xl text-blue-500 mb-2"></i>
+      <p class="text-gray-500 text-sm">Humidité</p>
+      <h3 class="text-2xl font-bold">65%</h3>
+    </div>
+
+    <!-- Vent -->
+    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
+      <i class="fas fa-wind text-3xl text-green-500 mb-2"></i>
+      <p class="text-gray-500 text-sm">Vent</p>
+      <h3 class="text-2xl font-bold">12 km/h</h3>
+    </div>
+
+    <!-- Précipitations -->
+    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
+      <i class="fas fa-cloud-showers-heavy text-3xl text-indigo-500 mb-2"></i>
+      <p class="text-gray-500 text-sm">Précipitations</p>
+      <h3 class="text-2xl font-bold">5 mm</h3>
+    </div>
+  </div>
 
   <!-- COURBE D'EVOLUTION SUR UNE SEMAINE -->
   <div class="bg-white p-4 rounded-xl shadow">
