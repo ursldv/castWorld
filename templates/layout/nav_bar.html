@@ -18,31 +18,29 @@
 <body class="bg-white text-gray-700 flex">
 
   <!-- Sidebar -->
-  <aside class="fixed top-0 left-0 h-full w-56 bg-gray-100 shadow-lg flex flex-col">
+  <aside class="fixed top-0 left-0 h-full w-56 bg-white shadow-lg flex flex-col">
     <div class="p-6 text-xl font-bold text-gray-800 border-b">
       🌦️ WorldCast
     </div>
     <nav class="flex-1 p-4 space-y-4">
-      <a href="{% url 'home' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600">
+      <a href="{% url 'home' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 m-6 p-2">
         <i class="fa fa-home"></i><span>Home</span>
       </a>
 
-      <a href="{% url 'map' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600">
+      <a href="{% url 'map' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 m-6 p-2">
         <i class="fa fa-map"></i><span>Map</span>
       </a>
-      <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600">
+      <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 m-6 p-2">
         <i class="fa fa-chart-line"></i><span>Dashboard</span>
       </a>
-       <a href="{% url 'suggestions' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600">
-        <i class="fa fa-chart-line"></i><span>Suggestions</span>
+       <a href="{% url 'suggestions' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 m-6 p-2">
+        <i class="fa fa-lightbulb"></i><span>Suggestions</span>
       </a>
-      <a href="{% url 'contact' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600">
+      <a href="{% url 'contact' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 m-6 p-2">
         <i class="fa fa-envelope"></i><span>Contact Us</span>
       </a>
     </nav>
-    <footer class="p-4 border-t text-sm text-gray-500">
-      © 2025 WorldCast
-    </footer>
+    
   </aside>
 
   <!-- Main content -->
@@ -57,11 +55,17 @@
       </div>
 
       <!-- Barre de recherche -->
-      <div class="flex-1 px-6">
+      <div class="w-1/2 mx-auto">
         <input type="text" placeholder="Rechercher un lieu..."
                class="w-full max-w-lg px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200">
       </div>
-
+        <!-- Icônes à droite -->
+      <div class="flex items-center space-x-4 text-gray-600">
+        <button class="hover:text-blue-600">
+          <i class="fa fa-moon"></i>
+        </button>
+        <input type="date" class="border rounded px-2 py-1">
+      </div>
      
     </header>
 
@@ -70,7 +74,9 @@
       {% block content %}
       {% endblock %}
     </main>
-
+<footer class="p-4 border-t text-sm text-gray-500">
+      © 2025 WorldCast
+    </footer>
   </div>
 
   <!-- Script custom -->
