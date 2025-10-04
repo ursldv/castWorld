@@ -45,7 +45,7 @@ def home(request):
 
     carte.add_child(folium.LatLngPopup())
 
-    carte_html = carte.repr_html()
+    carte_html = carte.repr_html_()
     return render(request, 'pages/index.html', {
         'message': message,
         'carte': carte_html,
