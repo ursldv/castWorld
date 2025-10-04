@@ -7,5 +7,9 @@ requests==2.32.5
 sqlparse==0.5.3
 tzdata==2025.2
 urllib3==2.5.0
+<<<<<<< HEAD
 geopy==2.4.1
 geocoder==1.38.1
+=======
+pandas==2.8.2
+>>>>>>> 239b8324a991047c69227cc1429d57bac887b64c
