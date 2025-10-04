@@ -1,10 +1,20 @@
 {% extends "layout/nav_bar.html" %}
 {% load static %}
 {% block title %}Accueil - WorldCast{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/index.css' %}">
+  <script src="{% static 'js/meteo.js' %} "defer ></script>
+{% endblock %}
 {% block content %}
 
 <div class="centent">
-  <div class=" ">
+  <div>
+     <p class=" text-lg mt-4 font-bold">{{ message }}</p>
+    <div class="carte">
+      {{ carte|safe }}
+    </div>
+  </div>
+  <div class="mt-6 ">
      <div
     class="bg-[#409ac7] text-white rounded-2xl shadow-lg flex justify-between w-[100%]  p-3 ">
 
