@@ -1,73 +1,76 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
 {% load static %}
+<!DOCTYPE html>
+<html lang="fr" class="">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}WorldCast{% endblock %}</title>
-  {% block head %}{% endblock %}
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
 
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
-  <!-- Ton style custom -->
-  <link rel="stylesheet" href="">
 </head>
-<body class="bg-white text-gray-700 flex">
+<body class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 flex transition-colors duration-300">
 
   <!-- Sidebar -->
-  <aside class="fixed top-0 left-0 h-full w-56 bg-white shadow-lg flex flex-col">
-    <div class="p-6 text-xl font-bold text-gray-800 border-b">
+  <aside class="fixed top-0 left-0 h-full w-56 bg-white dark:bg-gray-800 shadow-lg flex flex-col transition-colors duration-300">
+    <div class="p-6 text-xl font-bold text-gray-800 dark:text-gray-200 border-b">
       🌦️ WorldCast
     </div>
     <nav class="flex-1 p-4 space-y-4">
-      <a href="{% url 'home' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 m-6 p-2">
+      <a href="{% url 'home' %}" class="flex items-center space-x-3 m-6 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700
+         {% if request.resolver_match.url_name == 'home' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
         <i class="fa fa-home"></i><span>Home</span>
       </a>
-
-      <a href="{% url 'map' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 m-6 p-2">
+      <a href="{% url 'map' %}" class="flex items-center space-x-3 m-6 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700
+         {% if request.resolver_match.url_name == 'map' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
         <i class="fa fa-map"></i><span>Map</span>
       </a>
-      <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 m-6 p-2">
+      <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 m-6 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700
+         {% if request.resolver_match.url_name == 'dashboard' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
         <i class="fa fa-chart-line"></i><span>Dashboard</span>
       </a>
-       <a href="{% url 'suggestions' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 m-6 p-2">
+      <a href="{% url 'suggestions' %}" class="flex items-center space-x-3 m-6 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700
+         {% if request.resolver_match.url_name == 'suggestions' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
         <i class="fa fa-lightbulb"></i><span>Suggestions</span>
       </a>
-      <a href="{% url 'contact' %}" class="flex items-center space-x-3 text-gray-600 hover:text-blue-600 m-6 p-2">
+      <a href="{% url 'contact' %}" class="flex items-center space-x-3 m-6 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700
+         {% if request.resolver_match.url_name == 'contact' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
         <i class="fa fa-envelope"></i><span>Contact Us</span>
       </a>
     </nav>
-    
   </aside>
 
   <!-- Main content -->
   <div class="ml-56 flex-1 flex flex-col min-h-screen">
 
     <!-- Navbar -->
-    <header class="flex items-center justify-between bg-stone-100 border-b px-6 py-4 sticky top-0 z-10">
+    <header class="flex items-center justify-between bg-stone-100 dark:bg-gray-700 border-b px-6 py-4 sticky top-0 z-10 transition-colors duration-300">
       <!-- Localisation -->
-      <div class="flex items-center space-x-2 text-gray-600">
+      <div class="flex items-center space-x-2 text-gray-600 dark:text-gray-200">
         <i class="fa fa-location-dot"></i>
         <span>Bénin</span>
       </div>
 
-      <!-- Barre de recherche -->
-      <div class="w-1/2 mx-auto">
+      <!-- Barre de recherche avec icône -->
+      <div class="w-1/2 mx-auto relative">
+        <i class="fa fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-blue-400 dark:text-blue-300"></i>
         <input type="text" placeholder="Rechercher un lieu..."
-               class="w-full max-w-lg px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200">
+               class="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200 dark:focus:ring-blue-400 transition-colors duration-300">
       </div>
-        <!-- Icônes à droite -->
-      <div class="flex items-center space-x-4 text-gray-600">
-        <button class="hover:text-blue-600">
+
+      <!-- Icônes à droite -->
+      <div class="flex items-center space-x-4 text-gray-600 dark:text-gray-200">
+        <button id="toggleDark" class="hover:text-blue-600">
           <i class="fa fa-moon"></i>
         </button>
-        <input type="date" class="border rounded px-2 py-1">
+        <input type="date" class="border rounded px-2 py-1 dark:bg-gray-600 dark:text-gray-200">
       </div>
-     
     </header>
 
     <!-- Contenu dynamique -->
@@ -75,12 +78,19 @@
       {% block content %}
       {% endblock %}
     </main>
-<footer class="p-4 border-t text-sm text-gray-500">
+
+    <footer class="p-4 border-t text-sm text-gray-500 dark:text-gray-400">
       © 2025 WorldCast
     </footer>
   </div>
 
-  <!-- Script custom -->
-  <script src="{% static 'worldcast/js/script.js' %}"></script>
+  <!-- Script dark mode -->
+  <script>
+    const toggle = document.getElementById('toggleDark');
+    toggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+  </script>
+
 </body>
 </html>
