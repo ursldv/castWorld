@@ -1,78 +1,15 @@
+
 {% extends "layout/nav_bar.html" %}
-
+{% load static %}
 {% block title %}Accueil - WorldCast{% endblock %}
-
+{% block head %}
+  <link rel="stylesheet" href="{% static 'css/index.css' %}">
+  <script src="{% static 'js/meteo.js' %}" defer></script>
+{% endblock %}
 {% block content %}
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #e0f7fa, #ffffff);
-      background-color: red;
-    }
-
-    .weather-card {
-      background-color: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 20px;
-    }
-
-    .highlight-box {
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-
-    .forecast-item {
-      background-color: #e3f2fd;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-  </style>
 
   <div class="container weather-card">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="text-2xl font-bold text-primary">🌍 Londres, UK</h1>
-      <input type="text" class="form-control w-50" placeholder="🔍 Rechercher une ville...">
-    </div>
-
-    <!-- Current Weather -->
-    <div class="mb-4">
-      <h2 class="h5 text-secondary">🌤️ Partiellement nuageux</h2>
-      <p class="fs-5">Température actuelle : <span class="fw-bold text-danger">28°C</span></p>
-    </div>
-
-    <!-- Forecast -->
-    <div class="mb-4">
-      <h3 class="h6 mb-3">📅 Prévisions sur 3 jours</h3>
-      <div class="row">
-        <div class="col-md-4 forecast-item text-center">
-          <strong>Mercredi</strong><br>🌬️ 14°C - Vent
-        </div>
-        <div class="col-md-4 forecast-item text-center">
-          <strong>Jeudi</strong><br>🌧️ 18°C - Pluvieux
-        </div>
-        <div class="col-md-4 forecast-item text-center">
-          <strong>Vendredi</strong><br>☀️ 12°C - Soleil
-        </div>
-      </div>
-    </div>
-
-    <!-- Today's Highlights -->
-    <div>
-      <h3 class="h6 mb-3">📌 Temps forts du jour</h3>
-      <div class="row">
-        <div class="col-md-4 highlight-box">🌡️ Ressenti : 7°C <span class="text-muted">(Normal)</span></div>
-        <div class="col-md-4 highlight-box">☁️ Nuages : 18% <span class="text-muted">(Fort)</span></div>
-        <div class="col-md-4 highlight-box">🌧️ Pluie : 2% <span class="text-muted">(Normal)</span></div>
-        <div class="col-md-4 highlight-box">💧 Humidité : 65% <span class="text-muted">(Normal)</span></div>
-        <div class="col-md-4 highlight-box">🌞 UV : 7 <span class="text-muted">(Fort)</span></div>
-        <div class="col-md-4 highlight-box">🌫️ Couvert : 2% <span class="text-muted">(Normal)</span></div>
-      </div>
-    </div>
+    
   </div>
 
 
