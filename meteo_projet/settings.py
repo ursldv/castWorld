@@ -117,24 +117,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+STATIC_DIR = os.path.join(BASE_DIR, 'static')  # ← Défini une fois pour tous les cas
 
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
 if DEBUG:
     STATIC_URL = '/static/'
-    MEDIA_URL = '/media/'  # URL d'accès aux fichiers médias
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')  # Dossier où les fichiers médias seront stockés
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
     STATIC_ROOT = BASE_DIR / 'staticfiles'
     CKEDITOR_UPLOAD_PATH = "static/upload/"
-
     STATICFILES_DIRS = [STATIC_DIR]
 else:
     STATIC_URL = '/staticfiles/'
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
     STATICFILES_DIRS = [STATIC_DIR]
-    
     MEDIA_URL = 'staticfiles/media/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'staticfiles/media')
     CKEDITOR_UPLOAD_PATH = "staticfiles/upload/"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

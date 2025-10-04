@@ -4,13 +4,14 @@
 {% block title %}Accueil - WorldCast{% endblock %}
 {% block head %}
   <link rel="stylesheet" href="{% static 'css/index.css' %}">
-  <script src="{% static 'js/meteo.js' %}" defer></script>
+  <script src="{% static 'js/meteo.js' %} "defer ></script>
 {% endblock %}
 {% block content %}
 
-  <div class="container weather-card">
-    
-  </div>
+<div class="carte">
+  {{ carte|safe }}
+</div>
+<p class="text-center text-lg mt-4">{{ message }}</p>
 
 
 
