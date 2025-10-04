@@ -1,9 +1,21 @@
+
 from django.shortcuts import render
 from geopy.geocoders import Nominatim
 import folium
 import geocoder
 
+from requests import request
+# Create your views here.
+
+from datetime import date
+from meteo_app import geocode_city, get_weekly_precipitation
+
+
 def home(request):
+
+    jour = request.GET.get('date')
+    if not jour:
+        jour = date.today().isoformat()  # format "2025-10-04"
     bounds = [[6.2, 0.8], [12.5, 3.9]]  # Limites du Bénin
     lieu = request.GET.get('lieu')
     geolocator = Nominatim(user_agent="meteo_app")
@@ -34,14 +46,16 @@ def home(request):
 
     carte.add_child(folium.LatLngPopup())
 
-    carte_html = carte._repr_html_()
+    carte_html = carte.repr_html()
     return render(request, 'pages/index.html', {
+        'message': message,
         'carte': carte_html,
         'latitude': lat,
         'longitude': lon,
         'lieu': lieu or '',
-        'message': message,
-    })
+        'date': jour,
+        })
+  
 
 def dashboard(request):
     return render(request, 
