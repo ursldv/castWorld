@@ -24,14 +24,14 @@ def home(request):
         location = geolocator.geocode(lieu)
         if location:
             lat, lon = location.latitude, location.longitude
-            message = f"📍 Résultat pour : {lieu}"
+            message = f" Résultat pour : {lieu}"
         else:
             lat, lon = 6.3703, 2.3912
             message = f"❌ Lieu introuvable : {lieu}"
     else:
         g = geocoder.ip('me')
         lat, lon = g.latlng if g.latlng else (6.3703, 2.3912)
-        message = "📍 Position détectée automatiquement"
+        message = " Position détectée automatiquement"
 
     # Création de la carte APRÈS avoir défini lat/lon
     carte = folium.Map(location=[lat, lon], zoom_start=6, control_scale=True, max_bounds=True)

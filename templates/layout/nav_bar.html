@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}WorldCast{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
   {% block head %}
   {% endblock %}
 
@@ -61,8 +62,11 @@
       <!-- Barre de recherche avec icône -->
       
         <form method="get" action="{% url 'home' %}" class="sidebar-search">
-            <input type="text" name="lieu" value="{{ lieu }}" placeholder="Rechercher un lieu..."
+            <div class="w-[100%] mx-auto relative">
+                <i class="fa fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-blue-400 dark:text-blue-300"></i>
+                <input type="text" name="lieu" value="{{ lieu }}" placeholder="Rechercher un lieu..."
                     class="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200 dark:focus:ring-blue-400 transition-colors duration-300">
+            </div>
             <button type="submit" class="hidden">Rechercher</button>
         </form>
                 
