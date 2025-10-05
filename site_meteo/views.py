@@ -35,8 +35,8 @@ def home(request):
 
     jour = request.GET.get('date')
     if not jour:
-        jour = date.today().isoformat()  # format "2025-10-04"
-        bounds = [[6.2, 0.8], [12.5, 3.9]]  # Limites du Bénin
+        jour = date.today().isoformat()  
+        bounds = [[6.2, 0.8], [12.5, 3.9]]  # Limits of Bénin
         lieu = request.GET.get('lieu')
         geolocator = Nominatim(user_agent="meteo_app")
 
@@ -90,6 +90,9 @@ def home(request):
     })
 
 def dashboard(request):
+    jour = request.GET.get('date')
+    if not jour:
+        jour = date.today().isoformat()
     return render(request, 
                   'pages/dashboard.html', 
                   {})
@@ -98,13 +101,19 @@ def map_view(request):
                   'pages/map.html', 
                   {})
 def suggestions(request):
+    jour = request.GET.get('date')
+    if not jour:
+        jour = date.today().isoformat()
     return render(request, 
                   'pages/suggestions.html', 
                   {})
 def contact(request):
+    jour = request.GET.get('date')
+    if not jour:
+        jour = date.today().isoformat()
     return render(request, 
                   'pages/contact.html', 
-                  {})
+                  {'date': jour})
 
 
 

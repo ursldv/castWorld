@@ -28,23 +28,23 @@
     <nav class="flex-1 p-4 space-y-1">
       <a href="{% url 'home' %}" class="flex items-center  px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700
          {% if request.resolver_match.url_name == 'home' %}text-blue-600 bg-gray-200 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-        <i class="fa fa-home "></i><span class="ml-2">Home</span>
+        <i class="fa fa-home dark:text-gray-200"></i><span class="ml-2 dark:text-gray-200">Home</span>
       </a>
       <a href="{% url 'map' %}" class="flex items-center px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700
          {% if request.resolver_match.url_name == 'map' %}text-blue-600 bg-gray-200 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-        <i class="fa fa-map"></i><span class="ml-2">Map</span>
+        <i class="fa fa-map dark:text-gray-200"></i><span class="ml-2 dark:text-gray-200">Map</span>
       </a>
       <a href="{% url 'dashboard' %}" class="flex items-center px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700
          {% if request.resolver_match.url_name == 'dashboard' %}text-blue-600 bg-gray-200 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-        <i class="fa fa-chart-line"></i><span class="ml-2">Dashboard</span>
+        <i class="fa fa-chart-line dark:text-gray-200"></i><span class="ml-2 dark:text-gray-200">Dashboard</span>
       </a>
       <a href="{% url 'suggestions' %}" class="flex items-center px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700
          {% if request.resolver_match.url_name == 'suggestions' %}text-blue-600 bg-gray-20 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-        <i class="fa fa-lightbulb"></i><span class="ml-2">Suggestions</span>
+        <i class="fa fa-lightbulb dark:text-gray-200"></i><span class="ml-2 dark:text-gray-200">Suggestions</span>
       </a>
       <a href="{% url 'contact' %}" class="flex items-center px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700
          {% if request.resolver_match.url_name == 'contact' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-        <i class="fa fa-envelope"></i><span class="ml-2">Contact Us</span>
+        <i class="fa fa-envelope dark:text-gray-200"></i><span class="ml-2 dark:text-gray-200">Contact Us</span>
       </a>
     </nav>
   </aside>
