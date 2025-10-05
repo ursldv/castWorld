@@ -6,40 +6,31 @@ from django.http import HttpResponse
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
-
 from requests import request
 # Create your views here.
 
 from datetime import date
-
 import io
 from django.http import FileResponse
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
 import matplotlib.pyplot as plt
 import tempfile
-import io
-
-
-from requests import request
-# Create your views here.
-
-from datetime import date
 from meteo_app import get_weekly_precipitation
 
+def get_date_from_request(request):
+    return request.GET.get('date_choice') or date.today().isoformat()
+
+def get_lieu_from_request(request):
+    return request.GET.get('lieu', '')
 
 def home(request):
-
-    jour = request.GET.get('date_choice')
-    if not jour:
-        jour = date.today().isoformat()  # format "2025-10-04"
+    jour = get_date_from_request(request)
+    lieu = get_lieu_from_request(request)
     
     bounds = [[6.2, 0.8], [12.5, 3.9]]  # Limites du Bénin
-    lieu = request.GET.get('lieu')
     geolocator = Nominatim(user_agent="meteo_app")
 
     if lieu:
@@ -47,58 +38,54 @@ def home(request):
         if location:
             lat, lon = location.latitude, location.longitude
             message = f"✅ Résultat pour : {lieu}"
-            zoom_level = 12 
-            ville = lieu  # ✅ Stocker le nom de la ville pour l'affichage
+            zoom_level = 14  # Zoom rapproché pour un lieu spécifique
+            ville = lieu
         else:
             lat, lon = 6.3703, 2.3912  # Coordonnées par défaut (Cotonou, Bénin)
             message = f"❌ Lieu introuvable : {lieu}"
-            zoom_level = 6 
-            ville = "Cotonou, BJ"  # Ville par défaut
+            zoom_level = 6  # Zoom large pour lieu introuvable
+            ville = "Cotonou, BJ"
     else:
         g = geocoder.ip('me')
         lat, lon = g.latlng if g.latlng else (6.3703, 2.3912)
         message = "📍 Position détectée automatiquement"
-        zoom_level = 10  # Vue intermédiaire
-        # Essayer de récupérer le nom de la ville depuis la position
+        zoom_level = 10  # Zoom intermédiaire pour géolocalisation IP
         try:
             location_reverse = geolocator.reverse(f"{lat}, {lon}")
             ville = location_reverse.address.split(',')[0] if location_reverse else "Cotonou, BJ"
         except:
             ville = "Cotonou, BJ"
 
-    # Création de la carte APRÈS avoir défini lat/lon
+    # Création de la carte
     carte = folium.Map(location=[lat, lon], zoom_start=zoom_level, control_scale=True, max_bounds=True)
-    carte.fit_bounds(bounds)
+    carte.fit_bounds(bounds)  # Assure que la carte reste dans les limites du Bénin
 
+    # Ajouter un marqueur pour le lieu
     folium.Marker(
         [lat, lon],
         tooltip=message,
-        popup=f"<b>{message}</b>",
+        popup=f"<b>{message}</b><br>Lat: {lat:.4f}, Lon: {lon:.4f}",
         icon=folium.Icon(color="blue", icon="info-sign")
     ).add_to(carte)
 
     carte.add_child(folium.LatLngPopup())
-
     carte_html = carte._repr_html_()
 
     # Initialiser weather_data et température actuelle
     weather_data = []
-    temperature_actuelle = 28  # Valeur par défaut
-    condition_actuelle = "Partly Cloudy"  # Valeur par défaut
+    temperature_actuelle = 28
+    condition_actuelle = "Partly Cloudy"
     
     df = get_weekly_precipitation(lat, lon, jour)
     if df is None or df.empty:
         message += " | ❌ Données météo indisponibles"
     else:
         message += f" | ✅ Données météo du {jour} au {df['Date'].iloc[-1]}"
-        # Renommer la colonne problématique avant conversion
         df = df.rename(columns={'Probabilite_Max_%': 'Probabilite_Max'})
         
-        # Récupérer la température actuelle (premier jour)
         if 'Temperature_Max' in df.columns and not df.empty:
             temperature_actuelle = round(df['Temperature_Max'].iloc[0], 1)
         
-        # Déterminer la condition actuelle basée sur les précipitations du jour
         if 'Precipitation_mm' in df.columns and not df.empty:
             precip_aujourd_hui = df['Precipitation_mm'].iloc[0]
             if precip_aujourd_hui > 10:
@@ -108,13 +95,10 @@ def home(request):
             else:
                 condition_actuelle = "Sunny"
         
-        # Convertir le DataFrame en liste de dictionnaires
         weather_data = df.to_dict('records')
         
-        # S'assurer que les dates sont bien formatées
         for item in weather_data:
             if 'Date' in item and not isinstance(item['Date'], date):
-                # Convertir la date si c'est une chaîne
                 try:
                     from datetime import datetime
                     if isinstance(item['Date'], str):
@@ -122,56 +106,64 @@ def home(request):
                 except:
                     pass
 
-    
     return render(request, 'pages/index.html', {
         'message': message,
         'carte': carte_html,
         'latitude': lat,
         'longitude': lon,
-        'lieu': lieu or '',
+        'lieu': lieu,
         'jour': jour,
-        'weather_data': weather_data,  # ✅ Ajout des données météo avec dates
-        'ville': ville,  # ✅ Ajout de la ville
-        'temperature_actuelle': temperature_actuelle,  # ✅ Température actuelle
-        'condition_actuelle': condition_actuelle,  # ✅ Condition météo actuelle
+        'weather_data': weather_data,
+        'ville': ville,
+        'temperature_actuelle': temperature_actuelle,
+        'condition_actuelle': condition_actuelle,
     })
 
 from datetime import date
 from meteo_app import get_weekly_precipitation
 
 def dashboard(request):
-    jour = request.GET.get('date')
-    if not jour:
-        jour = date.today().isoformat()
-    return render(request, 
-                  'pages/dashboard.html', 
-                  {'date': jour,})
+    jour = get_date_from_request(request)
+    lieu = get_lieu_from_request(request)
+    return render(request, 'pages/dashboard.html', {
+        'date': jour,
+        'lieu': lieu,
+        'jour': jour,
+    })
+
 def map_view(request):
-    return render(request, 
-                  'pages/map.html', 
-                  {})
+    jour = get_date_from_request(request)
+    lieu = get_lieu_from_request(request)
+    return render(request, 'pages/map.html', {
+        'lieu': lieu,
+        'jour': jour,
+    })
+
 def suggestions(request):
-    jour = request.GET.get('date')
-    if not jour:
-        jour = date.today().isoformat()
-    return render(request, 
-                  'pages/suggestions.html', 
-                  {'date': jour,})
+    jour = get_date_from_request(request)
+    lieu = get_lieu_from_request(request)
+    return render(request, 'pages/suggestions.html', {
+        'date': jour,
+        'lieu': lieu,
+        'jour': jour,
+    })
+
 def contact(request):
-    jour = request.GET.get('date')
-    if not jour:
-        jour = date.today().isoformat()
-    return render(request, 
-                  'pages/contact.html', 
-                  {'date': jour})
-
-
+    jour = get_date_from_request(request)
+    lieu = get_lieu_from_request(request)
+    return render(request, 'pages/contact.html', {
+        'date': jour,
+        'lieu': lieu,
+        'jour': jour,
+    })
 
 def download_dashboard_pdf(request):
-    # Création du buffer mémoire
-    buffer = io.BytesIO()
+    lieu = request.GET.get('lieu', 'Cotonou, BJ')
+    jour = request.GET.get('date_choice') or date.today().isoformat()
+    lat = float(request.GET.get('latitude', 6.3703))
+    lon = float(request.GET.get('longitude', 2.3912))
 
-    # Création du document PDF
+    buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     elements = []
     styles = getSampleStyleSheet()
@@ -179,65 +171,103 @@ def download_dashboard_pdf(request):
     style_subtitle = styles["Heading2"]
     style_body = styles["BodyText"]
 
-    # --- TITRE PRINCIPAL ---
-    elements.append(Paragraph("🌍 WorldCast Weather Dashboard Report", style_title))
-    elements.append(Paragraph("Weekly summary of temperature, humidity, wind speed, and precipitation.", style_body))
+    elements.append(Paragraph(f"🌍 Rapport Météo WorldCast - {lieu}", style_title))
+    elements.append(Paragraph(f"Résumé hebdomadaire des précipitations et températures du {jour}", style_body))
     elements.append(Spacer(1, 12))
 
-    # --- TABLEAU DES VALEURS MOYENNES ---
+    df = get_weekly_precipitation(lat, lon, jour)
+    if df is None or df.empty:
+        elements.append(Paragraph("❌ Données météo indisponibles pour cette période ou ce lieu.", style_body))
+        elements.append(Spacer(1, 20))
+        doc.build(elements)
+        buffer.seek(0)
+        return FileResponse(buffer, as_attachment=True, filename="WorldCast_Dashboard_Report.pdf")
+
+    df = df.rename(columns={'Probabilite_Max_%': 'Probabilite_Max'})
+    avg_temperature = round(df['Temperature_Max'].mean(), 1) if 'Temperature_Max' in df.columns else 28
+    avg_precipitation = round(df['Precipitation_mm'].mean(), 1) if 'Precipitation_mm' in df.columns else 5
+    avg_humidity = 65
+    avg_wind_speed = 12
+
     data = [
-        ["Variable", "Value", "Unit"],
-        ["Temperature", "28", "°C"],
-        ["Humidity", "65", "%"],
-        ["Wind Speed", "12", "km/h"],
-        ["Precipitation", "5", "mm"]
+        ["Variable", "Valeur", "Unité"],
+        ["Température", f"{avg_temperature}", "°C"],
+        ["Humidité", f"{avg_humidity}", "%"],
+        ["Vitesse du vent", f"{avg_wind_speed}", "km/h"],
+        ["Précipitations", f"{avg_precipitation}", "mm"]
     ]
     table = Table(data, hAlign='LEFT')
     table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
-        ('TEXTCOLOR',(0,0),(-1,0),colors.whitesmoke),
-        ('ALIGN',(0,0),(-1,-1),'CENTER'),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
         ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
         ('FONTSIZE', (0,0), (-1,0), 12),
         ('BOTTOMPADDING', (0,0), (-1,0), 10),
-        ('BACKGROUND',(0,1),(-1,-1),colors.beige),
-        ('GRID',(0,0),(-1,-1),1,colors.gray)
+        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+        ('GRID', (0,0), (-1,-1), 1, colors.gray)
     ]))
     elements.append(table)
     elements.append(Spacer(1, 20))
 
-    # --- CRÉATION DES GRAPHIQUES AVEC MATPLOTLIB ---
-    variables = {
-        "Temperature (°C)": [28, 29, 27, 30, 31, 32, 29],
-        "Humidity (%)": [60, 62, 65, 63, 66, 64, 61],
-        "Wind Speed (km/h)": [10, 12, 14, 9, 11, 13, 12],
-        "Precipitation (mm)": [2, 5, 3, 4, 6, 5, 4],
-    }
-    days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    days = [d.strftime('%a') for d in df['Date']]
+    
+    plt.figure(figsize=(4, 2))
+    plt.plot(days, df['Precipitation_mm'], marker='o', color='skyblue', label='Précipitations (mm)')
+    plt.title("Précipitations Hebdomadaires")
+    plt.xlabel("Jours")
+    plt.ylabel("Précipitations (mm)")
+    plt.grid(True)
+    temp_img_precip = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+    plt.savefig(temp_img_precip.name, bbox_inches='tight')
+    plt.close()
 
-    for variable, values in variables.items():
-        plt.figure(figsize=(4,2))
-        plt.plot(days, values, marker='o', color='skyblue')
-        plt.title(variable)
-        plt.xlabel("Days")
-        plt.ylabel(variable.split()[0])
-        plt.grid(True)
-        temp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-        plt.savefig(temp_img.name, bbox_inches='tight')
-        plt.close()
+    elements.append(Paragraph("Précipitations Hebdomadaires", style_subtitle))
+    elements.append(Image(temp_img_precip.name, width=5*inch, height=2*inch))
+    elements.append(Paragraph("Ce graphique montre la variation hebdomadaire des précipitations.", style_body))
+    elements.append(Spacer(1, 20))
 
-        # Ajouter le graphique au PDF
-        elements.append(Paragraph(variable, style_subtitle))
-        elements.append(Image(temp_img.name, width=5*inch, height=2*inch))
-        elements.append(Paragraph(f"This chart shows the weekly variation of {variable.lower()}.", style_body))
-        elements.append(Spacer(1, 20))
+    plt.figure(figsize=(4, 2))
+    plt.plot(days, df['Temperature_Max'], marker='o', color='orange', label='Température (°C)')
+    plt.title("Températures Hebdomadaires")
+    plt.xlabel("Jours")
+    plt.ylabel("Température (°C)")
+    plt.grid(True)
+    temp_img_temp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+    plt.savefig(temp_img_temp.name, bbox_inches='tight')
+    plt.close()
 
-    # --- PIED DE PAGE ---
+    elements.append(Paragraph("Températures Hebdomadaires", style_subtitle))
+    elements.append(Image(temp_img_temp.name, width=5*inch, height=2*inch))
+    elements.append(Paragraph("Ce graphique montre la variation hebdomadaire des températures maximales.", style_body))
+    elements.append(Spacer(1, 20))
+
+    fig, ax1 = plt.subplots(figsize=(4, 2))
+    ax1.plot(days, df['Precipitation_mm'], marker='o', color='skyblue', label='Précipitations (mm)')
+    ax1.set_xlabel("Jours")
+    ax1.set_ylabel("Précipitations (mm)", color='skyblue')
+    ax1.tick_params(axis='y', labelcolor='skyblue')
+    ax1.grid(True)
+
+    ax2 = ax1.twinx()
+    ax2.plot(days, df['Temperature_Max'], marker='o', color='orange', label='Température (°C)')
+    ax2.set_ylabel("Température (°C)", color='orange')
+    ax2.tick_params(axis='y', labelcolor='orange')
+
+    plt.title("Évolution Hebdomadaire (Précipitations et Température)")
+    fig.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2)
+    temp_img_combined = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+    plt.savefig(temp_img_combined.name, bbox_inches='tight')
+    plt.close()
+
+    elements.append(Paragraph("Évolution Hebdomadaire", style_subtitle))
+    elements.append(Image(temp_img_combined.name, width=5*inch, height=2*inch))
+    elements.append(Paragraph("Ce graphique combine les précipitations et les températures pour montrer leur évolution hebdomadaire.", style_body))
+    elements.append(Spacer(1, 20))
+
     elements.append(Spacer(1, 30))
-    elements.append(Paragraph("<i>Generated automatically by WorldCast Dashboard © 2025</i>", style_body))
+    elements.append(Paragraph(f"<i>Généré automatiquement par WorldCast Dashboard © {date.today().year}</i>", style_body))
 
-    # Construction du PDF
     doc.build(elements)
     buffer.seek(0)
-
     return FileResponse(buffer, as_attachment=True, filename="WorldCast_Dashboard_Report.pdf")

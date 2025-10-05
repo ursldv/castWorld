@@ -1,6 +1,5 @@
 .carte {
   width: 100%;
-  height: 35vh; /* ← 35% de la hauteur de l’écran */
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   background-color: #f9f9f9;

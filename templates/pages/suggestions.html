@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div class="bg-[#409ac7] text-white text-center py-8">
+{% comment %} <div class="bg-[#409ac7] text-white text-center py-8">
   <h1 class="text-3xl font-bold mb-2">Weather-Based Suggestions</h1>
   <p class="text-sm opacity-90">Stay safe and prepared according to today’s weather conditions.</p>
 </div>
@@ -42,6 +42,13 @@
     </ul>
   </div>
 
-</div>
-
+</div>  {% endcomment %}
+ <h2 class="text-xl font-bold text-red-700">Alertes météo détectées</h2>
+  <ul class="list-disc pl-6 text-red-600">
+    {% for alert in alerts %}
+      <li>{{ alert.message }}</li>
+    {% empty %}
+      <li>Aucune alerte détectée pour cette période.</li>
+    {% endfor %}
+  </ul>
 {% endblock%}
