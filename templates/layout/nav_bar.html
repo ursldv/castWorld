@@ -22,8 +22,9 @@
 
   <!-- Sidebar -->
   <aside class="fixed top-0 left-0 h-full w-56 bg-white dark:bg-gray-800 shadow-lg flex flex-col transition-colors duration-300">
-    <div class="p-6 text-xl font-bold text-gray-800 dark:text-gray-200 border-b">
-      🌦️ WorldCast
+    <div class="p-6 border-b flex flex-col items-center">
+        <img src="{% static 'img/imgmeteo/logo.png' %}" alt="Logo WorldCast" class="w-25 h-20 mb-2">
+        <span class="text-xl font-bold text-gray-800 dark:text-gray-200">WorldCast</span>
     </div>
     <nav class="flex-1 p-4 space-y-1">
       <a href="{% url 'home' %}" class="flex items-center  px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700
