@@ -7,21 +7,21 @@
 {% endblock %}
 {% block content %}
 
-<div class="centent">
+<div class="centent mt-3">
   <div>
-     <p class=" text-lg mt-4 font-bold">{{ message }}</p>
+     <p class=" text-lg  font-bold pb-2">{{ message }}</p>
     <div class="carte">
       {{ carte|safe }}
     </div>
   </div>
-  <div class="mt-6 ">
+  <div class="mt-[50px] ">
      <div
-    class="bg-[#409ac7] text-white rounded-2xl shadow-lg flex justify-between w-[100%]  p-3 ">
+    class="bg-[#409ac7] text-white rounded-2xl shadow-lg flex justify-between  w-[100%]  p-3 ">
 
     <!-- Bloc gauche (ville + météo actuelle) -->
     <div class=" items-center space-x-4 px-6">
       <img src="{% static 'img/imgmeteo/cloud.png' %}" alt="temp"
-        class="w-24 h-24 items-center">
+        class="w-24 h-24 items-center px-2">
 
       <div class="flex space-between gap-6">
         <div>
@@ -102,46 +102,7 @@
  
 
 <!-- CONTENEUR DASHBOARD EN DESSOUS -->
-<div class="mt-8 p-6 bg-gray-100 rounded-2xl shadow ">
 
-  <h2 class="text-xl font-semibold mb-4 text-gray-800">Dashboard Météo</h2>
-
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
-    <!-- Température -->
-    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
-      <i class="fas fa-temperature-high text-3xl text-red-500 mb-2"></i>
-      <p class="text-gray-500 text-sm">Température</p>
-      <h3 class="text-2xl font-bold">28°</h3>
-    </div>
-
-    <!-- Humidité -->
-    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
-      <i class="fas fa-tint text-3xl text-blue-500 mb-2"></i>
-      <p class="text-gray-500 text-sm">Humidité</p>
-      <h3 class="text-2xl font-bold">65%</h3>
-    </div>
-
-    <!-- Vent -->
-    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
-      <i class="fas fa-wind text-3xl text-green-500 mb-2"></i>
-      <p class="text-gray-500 text-sm">Vent</p>
-      <h3 class="text-2xl font-bold">12 km/h</h3>
-    </div>
-
-    <!-- Précipitations -->
-    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
-      <i class="fas fa-cloud-showers-heavy text-3xl text-indigo-500 mb-2"></i>
-      <p class="text-gray-500 text-sm">Précipitations</p>
-      <h3 class="text-2xl font-bold">5 mm</h3>
-    </div>
-  </div>
-
-  <!-- COURBE D'EVOLUTION SUR UNE SEMAINE -->
-  <div class="bg-white p-4 rounded-xl shadow">
-    <canvas id="weatherChart" class="w-full h-64"></canvas>
-  </div>
-
-</div>
 
 <!-- Ajouter Chart.js depuis CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

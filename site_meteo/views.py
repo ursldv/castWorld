@@ -8,9 +8,6 @@ from requests import request
 # Create your views here.
 
 from datetime import date
-from meteo_app import geocode_city, get_weekly_precipitation
-
-
 def home(request):
 
     jour = request.GET.get('date')
@@ -55,7 +52,7 @@ def home(request):
         'lieu': lieu or '',
         'date': jour,
         })
-  
+
 
 def dashboard(request):
     return render(request, 
