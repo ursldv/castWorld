@@ -77,9 +77,15 @@
         <button id="toggleDark" class="hover:text-blue-600">
           <i class="fa fa-moon"></i>
         </button>
-        <input type="date" 
-       class="border rounded px-2 py-1 dark:bg-gray-600 dark:text-gray-200" name="date"
-       value="{{ date }}">
+        <form action="{% url 'home' %}" method="get">
+    <input type="date" 
+           class="border rounded px-2 py-1 dark:bg-gray-600 dark:text-gray-200" 
+           name="date_choice"
+           value="{{ jour }}"> 
+    <button type="submit" class="px-2 py-1 bg-blue-500 text-white rounded">Valider</button>
+</form>
+
+
 
   </div>
     </header>

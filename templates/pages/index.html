@@ -20,17 +20,40 @@
 
     <!-- Bloc gauche (ville + météo actuelle) -->
     <div class=" items-center space-x-4 px-6">
-      <img src="{% static 'img/imgmeteo/cloud.png' %}" alt="temp"
-        class="w-24 h-24 items-center px-2">
+         <p class=" rounded  px-2 w-[100px]"> {{ jour }}</p>
+          <!-- Icône selon les précipitations -->
+             {% for day in weather_data %}
+  {% if forloop.first %}
+    <!-- 👉 Ceci s’exécute uniquement pour le premier élément -->
+    <div class="">
+     
 
+      {% if day.Precipitation_mm > 10 %}
+        <img src="{% static 'img/imgmeteo/rainy.png' %}" alt="Rain" class="w-10 h-10">
+      {% elif day.Precipitation_mm > 0 %}
+        <img src="{% static 'img/imgmeteo/cloudly.png' %}" alt="Cloudy" class="w-10 h-10">
+      {% else %}
+        <img src="{% static 'img/imgmeteo/sun.png' %}" alt="Sun" class="w-10 h-10">
+      {% endif %}
+       <p class="text-lg font-bold">{{ day.Precipitation_mm }} mm</p>
       <div class="flex space-between gap-6">
-        <div>
-          <p>Partly Cloudy</p>
+        <div class="gap-6">
+          
           <h2 class="text-2xl font-semibold">{{ ville }}</h2> 
 
         </div>
-        <h1 class="text-5xl font-bold mt-2">28°</h1>
+        <h1 class="text-3xl font-bold mt-2">{{ day.Probabilite_Max }}%</h1>
       </div>
+      
+    </div>
+  {% endif %}
+{% endfor %}
+
+        
+       
+      
+
+      
     </div>
 
     <!-- Bloc droite (prévisions) -->

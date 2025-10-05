@@ -33,7 +33,7 @@ from meteo_app import get_weekly_precipitation
 
 def home(request):
 
-    jour = request.GET.get('date')
+    jour = request.GET.get('date_choice')
     if not jour:
         jour = date.today().isoformat()  # format "2025-10-04"
     
@@ -128,7 +128,7 @@ def home(request):
         'latitude': lat,
         'longitude': lon,
         'lieu': lieu or '',
-        'date': jour,
+        'jour': jour,
         'weather_data': weather_data,  # ✅ Ajout des données météo avec dates
         'ville': ville,  # ✅ Ajout de la ville
         'temperature_actuelle': temperature_actuelle,  # ✅ Température actuelle
