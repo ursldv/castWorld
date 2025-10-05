@@ -8,13 +8,8 @@
 {% block content %}
 
 <div class="centent mt-3">
-  <div>
-     <p class=" text-lg  font-bold pb-2">{{ message }}</p>
-    <div class="carte">
-      {{ carte|safe }}
-    </div>
-  </div>
-  <div class="mt-[50px] ">
+  
+  <div class="mt-[30px] ">
      <div
     class="bg-[#409ac7] text-white rounded-2xl shadow-lg flex justify-between  w-[100%]  p-3 ">
 
@@ -49,11 +44,7 @@
   {% endif %}
 {% endfor %}
 
-        
-       
-      
-
-      
+     
     </div>
 
     <!-- Bloc droite (prévisions) -->
@@ -88,8 +79,14 @@
         {% endif %}
      </div>
     </div>
-  </div>
 
+  </div>
+    <div class="mt-[30px]">
+     <p class=" text-lg  font-bold pb-2">{{ message }}</p>
+    <div class="carte p-5">
+      {{ carte|safe }}
+    </div>
+  </div> 
 <!-- CONTENEUR DASHBOARD EN DESSOUS -->
 
 

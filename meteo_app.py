@@ -52,3 +52,36 @@ def get_weekly_precipitation(latitude: float, longitude: float, start_date: str)
     except Exception as e:
         print(f"Une erreur inattendue est survenue : {e}")
         return None
+    
+def detect_meteo_risks(df):
+    from datetime import timedelta
+
+    alerts = []
+    sequence_seche = 0
+    seuil_inondation = 50  # mm de pluie en 24h
+
+    for item in df.to_dict('records'):
+        pluie = item.get('Precipitation_mm', 0)
+        date = item.get('Date')
+
+        # Séquence sèche
+        if pluie == 0:
+            sequence_seche += 1
+        else:
+            if sequence_seche >= 5:
+                alerts.append({
+                    "type": "Sécheresse",
+                    "message": f"🌵 Séquence sèche détectée jusqu’au {date}",
+                    "niveau": "moyen"
+                })
+            sequence_seche = 0
+
+        # Inondation localisée
+        if pluie >= seuil_inondation:
+            alerts.append({
+                "type": "Inondation",
+                "message": f"🌊 Risque d’inondation le {date} ({pluie} mm)",
+                "niveau": "élevé"
+            })
+
+    return alerts
