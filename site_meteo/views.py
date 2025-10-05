@@ -95,7 +95,7 @@ def dashboard(request):
         jour = date.today().isoformat()
     return render(request, 
                   'pages/dashboard.html', 
-                  {})
+                  {'date': jour,})
 def map_view(request):
     return render(request, 
                   'pages/map.html', 
@@ -106,7 +106,7 @@ def suggestions(request):
         jour = date.today().isoformat()
     return render(request, 
                   'pages/suggestions.html', 
-                  {})
+                  {'date': jour,})
 def contact(request):
     jour = request.GET.get('date')
     if not jour:

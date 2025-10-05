@@ -3,4 +3,45 @@
 {% block title %}Accueil - WorldCast{% endblock %}
 
 {% block content %}
+
+<div class="bg-[#409ac7] text-white text-center py-8">
+  <h1 class="text-3xl font-bold mb-2">Weather-Based Suggestions</h1>
+  <p class="text-sm opacity-90">Stay safe and prepared according to today’s weather conditions.</p>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  
+  <!-- Exemple pour pluie -->
+  <div class="bg-blue-100 border-l-4 border-blue-500 p-4 rounded-xl shadow-md">
+    <h3 class="font-bold text-blue-800 mb-2">🌧️ Rainy Weather</h3>
+    <ul class="list-disc ml-5 text-gray-700 space-y-1">
+      <li>Avoid walking in flood-prone streets.</li>
+      <li>Keep important documents in waterproof bags.</li>
+      <li>Unplug electrical devices if flood risk increases.</li>
+      <li>Follow local flood alerts from WorldCast.</li>
+    </ul>
+  </div>
+
+  <!-- Exemple pour forte chaleur -->
+  <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded-xl shadow-md">
+    <h3 class="font-bold text-yellow-800 mb-2">☀️ Hot Weather</h3>
+    <ul class="list-disc ml-5 text-gray-700 space-y-1">
+      <li>Drink enough water throughout the day.</li>
+      <li>Avoid staying in the sun between 11 a.m. and 3 p.m.</li>
+      <li>Wear light-colored clothes and a hat.</li>
+      <li>Check on elderly neighbors or children.</li>
+    </ul>
+  </div>
+
+  <!-- Exemple pour vent fort -->
+  <div class="bg-gray-100 border-l-4 border-gray-500 p-4 rounded-xl shadow-md">
+    <h3 class="font-bold text-gray-800 mb-2">🌬️ Strong Wind</h3>
+    <ul class="list-disc ml-5 text-gray-700 space-y-1">
+      <li>Secure outdoor objects (buckets, roofing sheets, etc.).</li>
+      <li>Avoid standing near trees or poles.</li>
+      <li>Stay indoors when wind speed increases.</li>
+    </ul>
+  </div>
+
+</div>
+
 {% endblock%}
