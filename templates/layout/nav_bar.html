@@ -43,7 +43,7 @@
 
       <a href="{% url 'suggestions' %}?lieu={{ lieu|urlencode }}&date_choice={{ jour|urlencode }}"
          class="flex items-center px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 
-         {% if request.resolver_match.url_name == 'suggestions' %}text-blue-600 bg-gray-200 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
+         {% if request.resolver_match.url_name == 'suggestions' %}text-blue-600 bg-gray-200 font-bold dark:bg-gray-700{% else %}text-gray-600 hover:text-blue-600{% endif %}">
         <i class="fa fa-lightbulb dark:text-gray-200"></i><span class="ml-2 dark:text-gray-200">Suggestions</span>
       </a>
 

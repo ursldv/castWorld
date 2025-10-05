@@ -30,57 +30,57 @@ def home(request):
     jour = get_date_from_request(request)
     lieu = get_lieu_from_request(request)
     
-    bounds = [[6.2, 0.8], [12.5, 3.9]]  # Limites du Bénin
+    bounds = [[6.2, 0.8], [12.5, 3.9]]  
     geolocator = Nominatim(user_agent="meteo_app")
 
     if lieu:
         location = geolocator.geocode(lieu)
         if location:
             lat, lon = location.latitude, location.longitude
-            message = f"✅ Résultat pour : {lieu}"
-            zoom_level = 14  # Zoom rapproché pour un lieu spécifique
+            message = f" Answers for : {lieu}"
+            zoom_level = 14  
             ville = lieu
         else:
-            lat, lon = 6.3703, 2.3912  # Coordonnées par défaut (Cotonou, Bénin)
-            message = f"❌ Lieu introuvable : {lieu}"
-            zoom_level = 6  # Zoom large pour lieu introuvable
+            lat, lon = 6.3703, 2.3912  
+            message = f" Place not found : {lieu}"
+            zoom_level = 6  
             ville = "Cotonou, BJ"
     else:
         g = geocoder.ip('me')
         lat, lon = g.latlng if g.latlng else (6.3703, 2.3912)
-        message = "📍 Position détectée automatiquement"
-        zoom_level = 10  # Zoom intermédiaire pour géolocalisation IP
+        message = "Location detected automatically"
+        zoom_level = 10  
         try:
             location_reverse = geolocator.reverse(f"{lat}, {lon}")
             ville = location_reverse.address.split(',')[0] if location_reverse else "Cotonou, BJ"
         except:
             ville = "Cotonou, BJ"
 
-    # Création de la carte
+    # MAP creation
     carte = folium.Map(location=[lat, lon], zoom_start=zoom_level, control_scale=True, max_bounds=True)
-    carte.fit_bounds(bounds)  # Assure que la carte reste dans les limites du Bénin
+    carte.fit_bounds(bounds)  
 
-    # Ajouter un marqueur pour le lieu
+    # Add a marker for the location
     folium.Marker(
         [lat, lon],
         tooltip=message,
         popup=f"<b>{message}</b><br>Lat: {lat:.4f}, Lon: {lon:.4f}",
-        icon=folium.Icon(color="blue", icon="info-sign")
+        icon=folium.Icon(color="red", icon="info-sign")
     ).add_to(carte)
 
     carte.add_child(folium.LatLngPopup())
     carte_html = carte._repr_html_()
 
-    # Initialiser weather_data et température actuelle
+    # Initialize weather_data and current temperature
     weather_data = []
     temperature_actuelle = 28
     condition_actuelle = "Partly Cloudy"
     
     df = get_weekly_precipitation(lat, lon, jour)
     if df is None or df.empty:
-        message += " | ❌ Données météo indisponibles"
+        message += " | Data not available for this location or period."
     else:
-        message += f" | ✅ Données météo du {jour} au {df['Date'].iloc[-1]}"
+        message += f" |  Weather data from {jour} to {df['Date'].iloc[-1]}"
         df = df.rename(columns={'Probabilite_Max_%': 'Probabilite_Max'})
         
         if 'Temperature_Max' in df.columns and not df.empty:
@@ -130,6 +130,90 @@ def dashboard(request):
         'lieu': lieu,
         'jour': jour,
     })
+import requests
+from datetime import datetime
+from django.shortcuts import render
+
+import requests
+from datetime import datetime, timedelta
+from django.shortcuts import render
+from geopy.geocoders import Nominatim
+
+import requests
+from datetime import datetime, timedelta
+from geopy.geocoders import Nominatim
+
+def dashboard(request):
+    jour = get_date_from_request(request)
+    lieu = get_lieu_from_request(request)
+
+    # Géolocalisation du lieu
+    geolocator = Nominatim(user_agent="meteo_app")
+    location = geolocator.geocode(lieu)
+    if not location:
+        return render(request, 'pages/dashboard.html', {
+            'error': f"Location '{lieu}' not found.",
+            'jour': jour,
+            'lieu': lieu,
+        })
+
+    latitude, longitude = location.latitude, location.longitude
+
+    # Déterminer la période (7 jours à partir du jour choisi)
+    start_date = jour
+    end_date = (datetime.strptime(jour, "%Y-%m-%d") + timedelta(days=6)).strftime("%Y-%m-%d")
+
+    # Requête vers Open-Meteo
+    url = (
+        f"https://api.open-meteo.com/v1/forecast?"
+        f"latitude={latitude}&longitude={longitude}"
+        f"&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,relative_humidity_2m_max"
+        f"&timezone=auto&start_date={start_date}&end_date={end_date}"
+    )
+
+    response = requests.get(url)
+    data = response.json()
+
+    if "daily" not in data:
+        return render(request, 'pages/dashboard.html', {
+            'error': "No weather data available.",
+            'jour': jour,
+            'lieu': lieu,
+        })
+
+    daily = data["daily"]
+
+    # Récupération des données
+    dates = daily.get("time", [])
+    temp_max = daily.get("temperature_2m_max", [])
+    temp_min = daily.get("temperature_2m_min", [])
+    humidite = daily.get("relative_humidity_2m_max", [])
+    vent = daily.get("wind_speed_10m_max", [])
+    precip = daily.get("precipitation_sum", [])
+
+    # Moyennes (pour les cartes du haut)
+    def moyenne(values):
+        return round(sum(values) / len(values), 1) if values else 0
+
+    temp_moy = moyenne([(x + y) / 2 for x, y in zip(temp_max, temp_min)])
+    humid_moy = moyenne(humidite)
+    vent_moy = moyenne(vent)
+    precip_moy = moyenne(precip)
+
+    return render(request, 'pages/dashboard.html', {
+        'jour': jour,
+        'lieu': lieu,
+        'dates': dates,
+        'temp_max': temp_max,
+        'temp_min': temp_min,
+        'humid': humidite,
+        'vent': vent,
+        'precip': precip,
+        'temp_moy': temp_moy,
+        'humid_moy': humid_moy,
+        'vent_moy': vent_moy,
+        'precip_moy': precip_moy,
+    })
 
 def map_view(request):
     jour = get_date_from_request(request)
@@ -155,31 +239,31 @@ def suggestions(request):
 
     df = get_weekly_precipitation(lat, lon, jour)
 
-    risque_inondation = "Données insuffisantes"
-    recommandation = "Impossible de formuler une recommandation sans données fiables."
+    risque_inondation = "Insufficient data to assess flood risk"
+    recommandation = "Impossible recommandation due to lack of data."
     message = ""
 
     if df is not None and not df.empty:
         avg_precip = df.get("Precipitation_mm", pd.Series([0])).mean()
-        avg_temp = df.get("Temperature_Max", pd.Series([28])).mean()  # Valeur par défaut si pas de colonne
+        avg_temp = df.get("Temperature_Max", pd.Series([28])).mean()  # default value
 
         if avg_precip >= 100:
-            risque_inondation = " Risque d’inondation critique"
+            risque_inondation = " Hard flood risk"
             recommandation = (
-                "Quittez les zones inondables si possible. "
-                "Protégez vos documents importants et coupez l’électricité en cas de montée d’eau."
+                "Leave flood-prone areas if possible."
+                "Protect your important documents and turn off the electricity in case of rising water."
             )
         elif avg_precip >= 70:
-            risque_inondation = "⚠️ Risque d’inondation élevé"
+            risque_inondation = "⚠️ High flood risk"
             recommandation = (
-                "Restez vigilants. Surélevez vos biens, évitez les déplacements en soirée, "
-                "et tenez-vous informés des alertes locales."
+                "Stay vigilant. Elevate your belongings, avoid travel in the evening, "
+                "and stay informed about local alerts."
             )
         elif avg_precip >= 40:
-            risque_inondation = " Risque modéré d’inondation"
+            risque_inondation = " Moderate flood risk"
             recommandation = (
-                "Nettoyez les caniveaux, évitez d’obstruer les voies d’écoulement, "
-                "et préparez un kit d’urgence si vous vivez en zone basse."
+                "Clean the gutters, avoid obstructing drainage paths, "
+                "and prepare an emergency kit if you live in a low-lying area."
             )
         else:
             risque_inondation = " Low flood risk"
@@ -189,12 +273,12 @@ def suggestions(request):
             
 
         if avg_temp > 35 and avg_precip > 40:
-            recommandation += " La chaleur pourrait intensifier le ruissellement, soyez attentif."
+            recommandation += " The heat could intensify runoff, be vigilant."
 
         dernier_jour = df['Date'].iloc[-1] if 'Date' in df.columns else jour
-        message = f"Data analyzed for {lieu or 'Cotonou'} du {jour} at {dernier_jour}."
+        message = f"Data analyzed for {lieu or 'Cotonou'} from {jour} to {dernier_jour}."
     else:
-        message = " Données météo indisponibles pour ce lieu ou cette période."
+        message = " Weather data not available for this location or period."
 
     return render(request, 'pages/suggestions.html', {
         'jour': jour,
@@ -215,6 +299,16 @@ def contact(request):
     })
 
 def download_dashboard_pdf(request):
+    import io, tempfile
+    import matplotlib.pyplot as plt
+    import pandas as pd
+    from datetime import date
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib import colors
+    from reportlab.lib.units import inch
+    from django.http import FileResponse
+
     lieu = request.GET.get('lieu', 'Cotonou, BJ')
     jour = request.GET.get('date_choice') or date.today().isoformat()
     lat = float(request.GET.get('latitude', 6.3703))
@@ -228,31 +322,32 @@ def download_dashboard_pdf(request):
     style_subtitle = styles["Heading2"]
     style_body = styles["BodyText"]
 
-    elements.append(Paragraph(f"🌍 Rapport Météo WorldCast - {lieu}", style_title))
-    elements.append(Paragraph(f"Résumé hebdomadaire des précipitations et températures du {jour}", style_body))
+    elements.append(Paragraph(f"WorldCast Weather Report - {lieu}", style_title))
+    elements.append(Paragraph(f"Weekly summary from {jour}", style_body))
     elements.append(Spacer(1, 12))
 
     df = get_weekly_precipitation(lat, lon, jour)
     if df is None or df.empty:
-        elements.append(Paragraph("❌ Données météo indisponibles pour cette période ou ce lieu.", style_body))
+        elements.append(Paragraph("❌ Weather data not available for this period or location.", style_body))
         elements.append(Spacer(1, 20))
         doc.build(elements)
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename="WorldCast_Dashboard_Report.pdf")
 
-    df = df.rename(columns={'Probabilite_Max_%': 'Probabilite_Max'})
-    avg_temperature = round(df['Temperature_Max'].mean(), 1) if 'Temperature_Max' in df.columns else 28
-    avg_precipitation = round(df['Precipitation_mm'].mean(), 1) if 'Precipitation_mm' in df.columns else 5
-    avg_humidity = 65
-    avg_wind_speed = 12
+    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+    days = [d.strftime('%a') for d in df['Date'] if pd.notnull(d)]
 
-    data = [
-        ["Variable", "Valeur", "Unité"],
-        ["Température", f"{avg_temperature}", "°C"],
-        ["Humidité", f"{avg_humidity}", "%"],
-        ["Vitesse du vent", f"{avg_wind_speed}", "km/h"],
-        ["Précipitations", f"{avg_precipitation}", "mm"]
-    ]
+    # Tableau résumé avec toutes les colonnes numériques connues
+    numeric_cols = ['Temperature_Max', 'Temperature_Min', 'Precipitation_mm', 'Humidity_%', 'Wind_km_h']
+    data = [["Variable", "Valeur moyenne", "Unité"]]
+    for col in numeric_cols:
+        if col in df.columns:
+            mean_val = round(df[col].mean(), 1)
+            unit = "°C" if "Temperature" in col else "%" if "Humidity" in col else "mm" if "Precipitation" in col else "km/h"
+            data.append([col.replace("_", " "), f"{mean_val}", unit])
+        else:
+            data.append([col.replace("_", " "), "N/A", "-"])
+
     table = Table(data, hAlign='LEFT')
     table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
@@ -267,63 +362,25 @@ def download_dashboard_pdf(request):
     elements.append(table)
     elements.append(Spacer(1, 20))
 
-    days = [d.strftime('%a') for d in df['Date']]
-    
-    plt.figure(figsize=(4, 2))
-    plt.plot(days, df['Precipitation_mm'], marker='o', color='skyblue', label='Précipitations (mm)')
-    plt.title("Précipitations Hebdomadaires")
-    plt.xlabel("Jours")
-    plt.ylabel("Précipitations (mm)")
-    plt.grid(True)
-    temp_img_precip = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-    plt.savefig(temp_img_precip.name, bbox_inches='tight')
-    plt.close()
+    # Créer un graphique pour chaque colonne numérique disponible
+    for col in numeric_cols:
+        if col in df.columns:
+            plt.figure(figsize=(4,2))
+            plt.plot(days, df[col], marker='o', label=col)
+            plt.title(col.replace("_", " "))
+            plt.xlabel("Days")
+            plt.ylabel(col.replace("_", " "))
+            plt.grid(True)
+            temp_img = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+            plt.savefig(temp_img.name, bbox_inches='tight')
+            plt.close()
+            elements.append(Paragraph(col.replace("_", " "), style_subtitle))
+            elements.append(Image(temp_img.name, width=5*inch, height=2*inch))
+            elements.append(Spacer(1, 20))
 
-    elements.append(Paragraph("Précipitations Hebdomadaires", style_subtitle))
-    elements.append(Image(temp_img_precip.name, width=5*inch, height=2*inch))
-    elements.append(Paragraph("Ce graphique montre la variation hebdomadaire des précipitations.", style_body))
-    elements.append(Spacer(1, 20))
-
-    plt.figure(figsize=(4, 2))
-    plt.plot(days, df['Temperature_Max'], marker='o', color='orange', label='Température (°C)')
-    plt.title("Températures Hebdomadaires")
-    plt.xlabel("Jours")
-    plt.ylabel("Température (°C)")
-    plt.grid(True)
-    temp_img_temp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-    plt.savefig(temp_img_temp.name, bbox_inches='tight')
-    plt.close()
-
-    elements.append(Paragraph("Températures Hebdomadaires", style_subtitle))
-    elements.append(Image(temp_img_temp.name, width=5*inch, height=2*inch))
-    elements.append(Paragraph("Ce graphique montre la variation hebdomadaire des températures maximales.", style_body))
-    elements.append(Spacer(1, 20))
-
-    fig, ax1 = plt.subplots(figsize=(4, 2))
-    ax1.plot(days, df['Precipitation_mm'], marker='o', color='skyblue', label='Précipitations (mm)')
-    ax1.set_xlabel("Jours")
-    ax1.set_ylabel("Précipitations (mm)", color='skyblue')
-    ax1.tick_params(axis='y', labelcolor='skyblue')
-    ax1.grid(True)
-
-    ax2 = ax1.twinx()
-    ax2.plot(days, df['Temperature_Max'], marker='o', color='orange', label='Température (°C)')
-    ax2.set_ylabel("Température (°C)", color='orange')
-    ax2.tick_params(axis='y', labelcolor='orange')
-
-    plt.title("Évolution Hebdomadaire (Précipitations et Température)")
-    fig.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=2)
-    temp_img_combined = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-    plt.savefig(temp_img_combined.name, bbox_inches='tight')
-    plt.close()
-
-    elements.append(Paragraph("Évolution Hebdomadaire", style_subtitle))
-    elements.append(Image(temp_img_combined.name, width=5*inch, height=2*inch))
-    elements.append(Paragraph("Ce graphique combine les précipitations et les températures pour montrer leur évolution hebdomadaire.", style_body))
-    elements.append(Spacer(1, 20))
-
+    # Footer
     elements.append(Spacer(1, 30))
-    elements.append(Paragraph(f"<i>Généré automatiquement par WorldCast Dashboard © {date.today().year}</i>", style_body))
+    elements.append(Paragraph(f"<i>Generated by WorldCast Dashboard © {date.today().year}</i>", style_body))
 
     doc.build(elements)
     buffer.seek(0)
