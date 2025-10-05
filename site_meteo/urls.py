@@ -7,4 +7,5 @@ urlpatterns = [
     path('map/', views.map_view, name='map'),
     path('suggestions/', views.suggestions, name='suggestions'),
     path('contact/', views.contact, name='contact'),
+    path('download-pdf/', views.download_dashboard_pdf, name='download_pdf'),
 ]

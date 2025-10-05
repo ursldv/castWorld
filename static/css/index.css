@@ -1,8 +1,6 @@
 .carte {
   width: 100%;
-  height: 40vh; /* ← 30% de la hauteur de la fenêtre */
-  margin: 0 auto;
-  
+  height: 100%;
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
   background-color: #f9f9f9;
@@ -11,6 +9,6 @@
 
 .leaflet-container {
   width: 100%;
-  height: 100%; /* ← prend toute la hauteur du conteneur .carte */
+  height: 100%;
   border-radius: 8px;
 }
