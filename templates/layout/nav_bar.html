@@ -107,5 +107,85 @@
       document.documentElement.classList.toggle('dark');
     });
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const track = document.getElementById('forecast-track');
+      // Récupère la liste des cartes originales
+      const cards = Array.from(track.getElementsByClassName('forecast-card'));
+      
+      // Étape 1 : Dupliquer le contenu (créer la boucle infinie)
+      if (cards.length > 0) {
+        cards.forEach(card => {
+          const clonedCard = card.cloneNode(true);
+          track.appendChild(clonedCard);
+        });
+      }
+
+      // Étape 2 : Calculer la largeur de la piste pour l'animation
+      const firstCard = cards[0];
+      const cardStyle = window.getComputedStyle(firstCard);
+      
+      // Calculer la largeur de la carte PLUS ses marges (m-1 = 4px de chaque côté)
+      const cardWidth = firstCard.offsetWidth;
+      const marginLeft = parseFloat(cardStyle.marginLeft);
+      const marginRight = parseFloat(cardStyle.marginRight);
+      const totalCardWidth = cardWidth + marginLeft + marginRight; 
+      
+      // Largeur totale d'un seul ensemble de contenu (Original)
+      const totalOriginalContentWidth = totalCardWidth * cards.length;
+      
+      // Définir la largeur de la piste pour qu'elle contienne l'Original + le Clone
+      // C'est ce qui rend l'animation CSS (-50%) fonctionnelle.
+      track.style.width = `${totalOriginalContentWidth * 2}px`;
+      
+      // Étape 3 : Appliquer la classe CSS pour démarrer l'animation
+      track.classList.add('scrolling');
+    });
+  </script>
+  <script>
+    const container = document.getElementById('weather-scroll');
+    const cards = document.getElementById('weather-cards');
+
+    let scrollPos = 0;
+    let speed = 1; // vitesse du défilement automatique
+    let isDragging = false;
+    let startX;
+
+    // Animation automatique
+    function animate() {
+      if (!isDragging) {
+        scrollPos -= speed;
+        if (Math.abs(scrollPos) >= cards.scrollWidth / 2) {
+          scrollPos = 0; // reset pour effet infini
+        }
+        cards.style.transform = `translateX(${scrollPos}px)`;
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Drag pour interagir
+    container.addEventListener('mousedown', e => {
+      isDragging = true;
+      startX = e.pageX - scrollPos;
+      cards.classList.add('dragging');
+    });
+    container.addEventListener('mousemove', e => {
+      if (isDragging) {
+        scrollPos = e.pageX - startX;
+        cards.style.transform = `translateX(${scrollPos}px)`;
+      }
+    });
+    container.addEventListener('mouseup', () => {
+      isDragging = false;
+      cards.classList.remove('dragging');
+    });
+    container.addEventListener('mouseleave', () => {
+      isDragging = false;
+      cards.classList.remove('dragging');
+    });
+  </script>
+</body>
+</html>
 </body>
 </html>
