@@ -11,49 +11,55 @@
   
   <div class="mt-[30px] ">
      <div
-    class="bg-[#409ac7] text-white rounded-2xl shadow-lg flex justify-between  w-[100%]  p-3 ">
+    class="bg-[#409ac7] text-white rounded-2xl shadow-lg max-h-full flex justify-between  w-[100%]  p-3 ">
 
     <!-- Bloc gauche (ville + météo actuelle) -->
-    <div class=" items-center space-x-4 px-6">
-         <p class=" rounded  px-2 w-[100px]"> {{ jour }}</p>
-          <!-- Icône selon les précipitations -->
-             {% for day in weather_data %}
-  {% if forloop.first %}
-    <!-- 👉 Ceci s’exécute uniquement pour le premier élément -->
-    <div class="">
-     
+<div class="items-center space-x-4 px-6">
+  <p class="rounded px-2 w-[100px] text-sm font-medium text-white bg-transparent">
+    {{ jour }}
+  </p>
 
-      {% if day.Precipitation_mm > 10 %}
-        <img src="{% static 'img/imgmeteo/rainy.png' %}" alt="Rain" class="w-10 h-10">
-      {% elif day.Precipitation_mm > 0 %}
-        <img src="{% static 'img/imgmeteo/cloudly.png' %}" alt="Cloudy" class="w-10 h-10">
-      {% else %}
-        <img src="{% static 'img/imgmeteo/sun.png' %}" alt="Sun" class="w-10 h-10">
-      {% endif %}
-       <p class="text-lg font-bold">{{ day.Precipitation_mm }} mm</p>
-      <div class="flex space-between gap-6">
-        <div class="gap-6">
-          
-          <h2 class="text-2xl font-semibold">{{ ville }}</h2> 
-
-        </div>
-        <h1 class="text-3xl font-bold mt-2">{{ day.Probabilite_Max }}%</h1>
-      </div>
-      
-    </div>
+  {% for day in weather_data %}
+    {% if forloop.first %}
+      <div class="bg-transparent rounded-xl p-4 w-full max-w-md text-white">
+  {% if day.Precipitation_mm > 10 %}
+    <img src="{% static 'img/imgmeteo/rainy.png' %}" alt="Rain" class="w-20 h-20 mb-2">
+    <p class="text-sm italic text-gray-300">Heavy rain</p>
+  {% elif day.Precipitation_mm > 0 %}
+    <img src="{% static 'img/imgmeteo/cloudly.png' %}" alt="Cloudy" class="w-20 h-20 mb-2">
+    {% if day.Precipitation_mm < 1 %}
+      <p class="text-sm italic text-gray-300">Very light drizzle</p>
+    {% else %}
+      <p class="text-sm italic text-gray-300">Light rain</p>
+    {% endif %}
+  {% else %}
+    <img src="{% static 'img/imgmeteo/sun.png' %}" alt="Sun" class="w-20 h-20 mb-2">
+    <p class="text-sm italic text-gray-300">Clear skies</p>
   {% endif %}
-{% endfor %}
 
-     
+  <p class="text-lg font-bold">{{ day.Precipitation_mm }} mm</p>
+
+  <div class="flex justify-between items-center mt-4">
+    <div>
+      <h2 class="text-xl font-semibold">{{ ville }}</h2>
     </div>
+    <h1 class="text-3xl font-extrabold">{{ day.Probabilite_Max }}%</h1>
+  </div>
+</div>
+
+    {% endif %}
+  {% endfor %}
+</div>
+
+
 
     <!-- Bloc droite (prévisions) -->
      <!-- Bloc droite (prévisions) -->
-    <div id="weather-scroll" class="overflow-hidden w-[500px] relative">
+    <div id="weather-scroll" class="overflow-hidden w-[700px] flex items-center relative">
       <div id="weather-cards" class="flex space-x-4 absolute">
         {% if weather_data %}
           {% for day in weather_data %}
-            <div class="bg-white text-gray-800 rounded-xl p-4 min-w-[150px] flex flex-col items-center shadow">
+            <div class="bg-white text-gray-800 rounded-xl p-5 h-[100%] min-w-[160px] flex flex-col items-center shadow">
               <!-- Afficher les précipitations -->
               <p class="text-lg font-bold">{{ day.Precipitation_mm }} mm</p>
           
