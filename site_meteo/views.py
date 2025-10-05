@@ -35,26 +35,38 @@ def home(request):
 
     jour = request.GET.get('date')
     if not jour:
-        jour = date.today().isoformat()  
-        bounds = [[6.2, 0.8], [12.5, 3.9]]  # Limits of Bénin
-        lieu = request.GET.get('lieu')
-        geolocator = Nominatim(user_agent="meteo_app")
+        jour = date.today().isoformat()  # format "2025-10-04"
+    
+    bounds = [[6.2, 0.8], [12.5, 3.9]]  # Limites du Bénin
+    lieu = request.GET.get('lieu')
+    geolocator = Nominatim(user_agent="meteo_app")
 
     if lieu:
         location = geolocator.geocode(lieu)
         if location:
             lat, lon = location.latitude, location.longitude
-            message = f" Résultat pour : {lieu}"
+            message = f"✅ Résultat pour : {lieu}"
+            zoom_level = 12 
+            ville = lieu  # ✅ Stocker le nom de la ville pour l'affichage
         else:
-            lat, lon = 6.3703, 2.3912
+            lat, lon = 6.3703, 2.3912  # Coordonnées par défaut (Cotonou, Bénin)
             message = f"❌ Lieu introuvable : {lieu}"
+            zoom_level = 6 
+            ville = "Cotonou, BJ"  # Ville par défaut
     else:
         g = geocoder.ip('me')
         lat, lon = g.latlng if g.latlng else (6.3703, 2.3912)
-        message = " Position détectée automatiquement"
+        message = "📍 Position détectée automatiquement"
+        zoom_level = 10  # Vue intermédiaire
+        # Essayer de récupérer le nom de la ville depuis la position
+        try:
+            location_reverse = geolocator.reverse(f"{lat}, {lon}")
+            ville = location_reverse.address.split(',')[0] if location_reverse else "Cotonou, BJ"
+        except:
+            ville = "Cotonou, BJ"
 
     # Création de la carte APRÈS avoir défini lat/lon
-    carte = folium.Map(location=[lat, lon], zoom_start=6, control_scale=True, max_bounds=True)
+    carte = folium.Map(location=[lat, lon], zoom_start=zoom_level, control_scale=True, max_bounds=True)
     carte.fit_bounds(bounds)
 
     folium.Marker(
@@ -68,16 +80,47 @@ def home(request):
 
     carte_html = carte._repr_html_()
 
+    # Initialiser weather_data et température actuelle
+    weather_data = []
+    temperature_actuelle = 28  # Valeur par défaut
+    condition_actuelle = "Partly Cloudy"  # Valeur par défaut
+    
     df = get_weekly_precipitation(lat, lon, jour)
-    if df is None:
+    if df is None or df.empty:
         message += " | ❌ Données météo indisponibles"
     else:
         message += f" | ✅ Données météo du {jour} au {df['Date'].iloc[-1]}"
         # Renommer la colonne problématique avant conversion
         df = df.rename(columns={'Probabilite_Max_%': 'Probabilite_Max'})
+        
+        # Récupérer la température actuelle (premier jour)
+        if 'Temperature_Max' in df.columns and not df.empty:
+            temperature_actuelle = round(df['Temperature_Max'].iloc[0], 1)
+        
+        # Déterminer la condition actuelle basée sur les précipitations du jour
+        if 'Precipitation_mm' in df.columns and not df.empty:
+            precip_aujourd_hui = df['Precipitation_mm'].iloc[0]
+            if precip_aujourd_hui > 10:
+                condition_actuelle = "Rainy"
+            elif precip_aujourd_hui > 0:
+                condition_actuelle = "Cloudy"
+            else:
+                condition_actuelle = "Sunny"
+        
         # Convertir le DataFrame en liste de dictionnaires
         weather_data = df.to_dict('records')
-       
+        
+        # S'assurer que les dates sont bien formatées
+        for item in weather_data:
+            if 'Date' in item and not isinstance(item['Date'], date):
+                # Convertir la date si c'est une chaîne
+                try:
+                    from datetime import datetime
+                    if isinstance(item['Date'], str):
+                        item['Date'] = datetime.strptime(item['Date'], '%Y-%m-%d').date()
+                except:
+                    pass
+
     
     return render(request, 'pages/index.html', {
         'message': message,
@@ -86,7 +129,10 @@ def home(request):
         'longitude': lon,
         'lieu': lieu or '',
         'date': jour,
-        'weather_data': weather_data,  # ✅ Ajout des données météo
+        'weather_data': weather_data,  # ✅ Ajout des données météo avec dates
+        'ville': ville,  # ✅ Ajout de la ville
+        'temperature_actuelle': temperature_actuelle,  # ✅ Température actuelle
+        'condition_actuelle': condition_actuelle,  # ✅ Condition météo actuelle
     })
 
 def dashboard(request):
