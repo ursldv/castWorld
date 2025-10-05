@@ -1,13 +1,12 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="fr" class="">
+<html lang="en" class="">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}WorldCast{% endblock %}</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
-  {% block head %}
-  {% endblock %}
+  {% block head %}{% endblock %}
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,72 +17,79 @@
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 flex transition-colors duration-300">
 
   <!-- Sidebar -->
   <aside class="fixed top-0 left-0 h-full w-56 bg-white dark:bg-gray-800 shadow-lg flex flex-col transition-colors duration-300">
-    <div class="p-6 text-xl font-bold text-gray-800 dark:text-gray-200 border-b">
-      🌦️ WorldCast
+    <div class="p-6 border-b flex flex-col items-center">
+      <img src="{% static 'img/imgmeteo/logo.png' %}" alt="Logo WorldCast" class="w-25 h-20 mb-2">
+      <span class="text-xl font-bold text-gray-800 dark:text-gray-200">WorldCast</span>
     </div>
-    <nav class="flex-1 p-4 space-y-4">
-      <a href="{% url 'home' %}" class="flex items-center space-x-3 m-6 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700
-         {% if request.resolver_match.url_name == 'home' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-        <i class="fa fa-home"></i><span>Home</span>
+
+    <nav class="flex-1 p-4 space-y-1">
+      <a href="{% url 'home' %}?lieu={{ lieu|urlencode }}&date_choice={{ jour|urlencode }}"
+         class="flex items-center px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 
+         {% if request.resolver_match.url_name == 'home' %}text-blue-600 bg-gray-200 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
+        <i class="fa fa-home dark:text-gray-200"></i><span class="ml-2 dark:text-gray-200">Home</span>
       </a>
-      <a href="{% url 'map' %}" class="flex items-center space-x-3 m-6 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700
-         {% if request.resolver_match.url_name == 'map' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-        <i class="fa fa-map"></i><span>Map</span>
+
+      <a href="{% url 'dashboard' %}?lieu={{ lieu|urlencode }}&date_choice={{ jour|urlencode }}"
+         class="flex items-center px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 
+         {% if request.resolver_match.url_name == 'dashboard' %}text-blue-600 bg-gray-200 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
+        <i class="fa fa-chart-line dark:text-gray-200"></i><span class="ml-2 dark:text-gray-200">Dashboard</span>
       </a>
-      <a href="{% url 'dashboard' %}" class="flex items-center space-x-3 m-6 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700
-         {% if request.resolver_match.url_name == 'dashboard' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-        <i class="fa fa-chart-line"></i><span>Dashboard</span>
+
+      <a href="{% url 'suggestions' %}?lieu={{ lieu|urlencode }}&date_choice={{ jour|urlencode }}"
+         class="flex items-center px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 
+         {% if request.resolver_match.url_name == 'suggestions' %}text-blue-600 bg-gray-200 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
+        <i class="fa fa-lightbulb dark:text-gray-200"></i><span class="ml-2 dark:text-gray-200">Suggestions</span>
       </a>
-      <a href="{% url 'suggestions' %}" class="flex items-center space-x-3 m-6 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700
-         {% if request.resolver_match.url_name == 'suggestions' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-        <i class="fa fa-lightbulb"></i><span>Suggestions</span>
-      </a>
-      <a href="{% url 'contact' %}" class="flex items-center space-x-3 m-6 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700
+
+      <a href="{% url 'contact' %}?lieu={{ lieu|urlencode }}&date_choice={{ jour|urlencode }}"
+         class="flex items-center px-4 py-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 
          {% if request.resolver_match.url_name == 'contact' %}text-blue-600 font-bold{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-        <i class="fa fa-envelope"></i><span>Contact Us</span>
+        <i class="fa fa-envelope dark:text-gray-200"></i><span class="ml-2 dark:text-gray-200">Contact Us</span>
       </a>
     </nav>
   </aside>
 
   <!-- Main content -->
-  <div class="ml-56 flex-1 flex flex-col min-h-screen ">
+  <div class="ml-56 flex-1 flex flex-col min-h-screen">
 
     <!-- Navbar -->
     <header class="flex items-center justify-between bg-stone-100 dark:bg-gray-700 border-b px-6 py-4 sticky top-0 z-10 transition-colors duration-300">
-      <!-- Localisation -->
+      
       <div class="flex items-center space-x-2 text-gray-600 dark:text-gray-200">
-       <span class="fi fi-bj"></span>
+    
       </div>
 
-      <!-- Barre de recherche avec icône -->
-      
-        <form method="get" action="{% url 'home' %}" class="sidebar-search">
-            <div class="w-[100%] mx-auto relative">
-                <i class="fa fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-blue-400 dark:text-blue-300"></i>
-                <input type="text" name="lieu" value="{{ lieu }}" placeholder="Rechercher un lieu..."
-                    class="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200 dark:focus:ring-blue-400 transition-colors duration-300">
-            </div>
-            <button type="submit" class="hidden">Rechercher</button>
-        </form>
-                
+      <!-- Search bar -->
+      <form method="get" action="{% url 'home' %}" class="flex items-center space-x-4 w-full max-w-lg">
+        <div class="relative flex-1">
+          <i class="fa fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-blue-400 dark:text-blue-300"></i>
+          <input type="text" name="lieu" value="{{ lieu|default:'' }}" placeholder="Search a place..."
+                 class="w-full pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-200 dark:focus:ring-blue-400 dark:bg-gray-600 dark:text-gray-200 transition-colors duration-300"
+                 aria-label="Search a place">
+        </div>
+        <div>
+          <input type="date" name="date_choice" value="{{ jour|default:'' }}"
+                 class="border rounded px-2 py-2 dark:bg-gray-600 dark:text-gray-200 focus:outline-none focus:ring focus:ring-blue-200 dark:focus:ring-blue-400 transition-colors duration-300">
+        </div>
+        <button type="submit" class="px-4 py-2 bg-[#409ac7] text-white rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-200 dark:focus:ring-blue-400 transition-colors duration-300">
+          Validate
+        </button>
+      </form>
 
-      <!-- Icônes à droite -->
-      <div class="flex items-center space-x-4 text-gray-600 dark:text-gray-200">
+      <!-- Dark mode button -->
+      <div class="flex items-center text-gray-600 dark:text-gray-200">
         <button id="toggleDark" class="hover:text-blue-600">
           <i class="fa fa-moon"></i>
         </button>
-        <input type="date" 
-       class="border rounded px-2 py-1 dark:bg-gray-600 dark:text-gray-200" name="date"
-       value="{{ date }}">
-
-  </div>
+      </div>
     </header>
 
-    <!-- Contenu dynamique -->
+    <!-- Dynamic content -->
     <main class="flex-1 p-3">
       {% block content %}
       {% endblock %}
@@ -94,7 +100,7 @@
     </footer>
   </div>
 
-  <!-- Script dark mode -->
+  <!-- Dark mode script -->
   <script>
     const toggle = document.getElementById('toggleDark');
     toggle.addEventListener('click', () => {
@@ -102,86 +108,84 @@
     });
   </script>
   <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const track = document.getElementById('forecast-track');
-    // Récupère la liste des cartes originales
-    const cards = Array.from(track.getElementsByClassName('forecast-card'));
-    
-    // Étape 1 : Dupliquer le contenu (créer la boucle infinie)
-    if (cards.length > 0) {
+    document.addEventListener('DOMContentLoaded', function () {
+      const track = document.getElementById('forecast-track');
+      // Récupère la liste des cartes originales
+      const cards = Array.from(track.getElementsByClassName('forecast-card'));
+      
+      // Étape 1 : Dupliquer le contenu (créer la boucle infinie)
+      if (cards.length > 0) {
         cards.forEach(card => {
-            const clonedCard = card.cloneNode(true);
-            track.appendChild(clonedCard);
+          const clonedCard = card.cloneNode(true);
+          track.appendChild(clonedCard);
         });
+      }
+
+      // Étape 2 : Calculer la largeur de la piste pour l'animation
+      const firstCard = cards[0];
+      const cardStyle = window.getComputedStyle(firstCard);
+      
+      // Calculer la largeur de la carte PLUS ses marges (m-1 = 4px de chaque côté)
+      const cardWidth = firstCard.offsetWidth;
+      const marginLeft = parseFloat(cardStyle.marginLeft);
+      const marginRight = parseFloat(cardStyle.marginRight);
+      const totalCardWidth = cardWidth + marginLeft + marginRight; 
+      
+      // Largeur totale d'un seul ensemble de contenu (Original)
+      const totalOriginalContentWidth = totalCardWidth * cards.length;
+      
+      // Définir la largeur de la piste pour qu'elle contienne l'Original + le Clone
+      // C'est ce qui rend l'animation CSS (-50%) fonctionnelle.
+      track.style.width = `${totalOriginalContentWidth * 2}px`;
+      
+      // Étape 3 : Appliquer la classe CSS pour démarrer l'animation
+      track.classList.add('scrolling');
+    });
+  </script>
+  <script>
+    const container = document.getElementById('weather-scroll');
+    const cards = document.getElementById('weather-cards');
+
+    let scrollPos = 0;
+    let speed = 1; // vitesse du défilement automatique
+    let isDragging = false;
+    let startX;
+
+    // Animation automatique
+    function animate() {
+      if (!isDragging) {
+        scrollPos -= speed;
+        if (Math.abs(scrollPos) >= cards.scrollWidth / 2) {
+          scrollPos = 0; // reset pour effet infini
+        }
+        cards.style.transform = `translateX(${scrollPos}px)`;
+      }
+      requestAnimationFrame(animate);
     }
+    animate();
 
-    // Étape 2 : Calculer la largeur de la piste pour l'animation
-    const firstCard = cards[0];
-    const cardStyle = window.getComputedStyle(firstCard);
-    
-    // Calculer la largeur de la carte PLUS ses marges (m-1 = 4px de chaque côté)
-    const cardWidth = firstCard.offsetWidth;
-    const marginLeft = parseFloat(cardStyle.marginLeft);
-    const marginRight = parseFloat(cardStyle.marginRight);
-    const totalCardWidth = cardWidth + marginLeft + marginRight; 
-    
-    // Largeur totale d'un seul ensemble de contenu (Original)
-    const totalOriginalContentWidth = totalCardWidth * cards.length;
-    
-    // Définir la largeur de la piste pour qu'elle contienne l'Original + le Clone
-    // C'est ce qui rend l'animation CSS (-50%) fonctionnelle.
-    track.style.width = `${totalOriginalContentWidth * 2}px`;
-    
-    // Étape 3 : Appliquer la classe CSS pour démarrer l'animation
-    track.classList.add('scrolling');
-});
-</script>
-<script>
-const container = document.getElementById('weather-scroll');
-const cards = document.getElementById('weather-cards');
-
-let scrollPos = 0;
-let speed = 1; // vitesse du défilement automatique
-let isDragging = false;
-let startX;
-
-// Animation automatique
-function animate() {
-  if(!isDragging){
-    scrollPos -= speed;
-    if(Math.abs(scrollPos) >= cards.scrollWidth / 2){
-      scrollPos = 0; // reset pour effet infini
-    }
-    cards.style.transform = `translateX(${scrollPos}px)`;
-  }
-  requestAnimationFrame(animate);
-}
-animate();
-
-// Drag pour interagir
-container.addEventListener('mousedown', e => {
-  isDragging = true;
-  startX = e.pageX - scrollPos;
-  cards.classList.add('dragging');
-});
-container.addEventListener('mousemove', e => {
-  if(isDragging){
-    scrollPos = e.pageX - startX;
-    cards.style.transform = `translateX(${scrollPos}px)`;
-  }
-});
-container.addEventListener('mouseup', () => {
-  isDragging = false;
-  cards.classList.remove('dragging');
-});
-container.addEventListener('mouseleave', () => {
-  isDragging = false;
-  cards.classList.remove('dragging');
-});
-</script>
-
-
-
+    // Drag pour interagir
+    container.addEventListener('mousedown', e => {
+      isDragging = true;
+      startX = e.pageX - scrollPos;
+      cards.classList.add('dragging');
+    });
+    container.addEventListener('mousemove', e => {
+      if (isDragging) {
+        scrollPos = e.pageX - startX;
+        cards.style.transform = `translateX(${scrollPos}px)`;
+      }
+    });
+    container.addEventListener('mouseup', () => {
+      isDragging = false;
+      cards.classList.remove('dragging');
+    });
+    container.addEventListener('mouseleave', () => {
+      isDragging = false;
+      cards.classList.remove('dragging');
+    });
+  </script>
 </body>
-
+</html>
+</body>
 </html>
