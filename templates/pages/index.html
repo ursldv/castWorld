@@ -8,19 +8,15 @@
 {% block content %}
 
 <div class="centent mt-3">
-  <div>
-     <p class=" text-lg  font-bold pb-2">{{ message }}</p>
-    <div class="carte">
-      {{ carte|safe }}
-    </div>
-  </div>
-  <div class="mt-[50px] ">
+  
+  <div class="mt-[15px] ">
      <div
     class="bg-[#409ac7] text-white rounded-2xl shadow-lg flex justify-between  w-[100%]  p-3 ">
 
     <!-- Bloc gauche (ville + météo actuelle) -->
     <div class=" items-center space-x-4 px-6">
-         <p class=" rounded  px-2 w-[100px]"> {{ jour }}</p>
+         <p class=" rounded  px-2 w-[100px]"> {{ jour }}
+</p>
           <!-- Icône selon les précipitations -->
              {% for day in weather_data %}
   {% if forloop.first %}
@@ -28,21 +24,24 @@
     <div class="">
      
 
-      {% if day.Precipitation_mm > 10 %}
+      {% if day.Precipitation_mm > 4 %}
         <img src="{% static 'img/imgmeteo/rainy.png' %}" alt="Rain" class="w-10 h-10">
+        High proability of rain
       {% elif day.Precipitation_mm > 0 %}
         <img src="{% static 'img/imgmeteo/cloudly.png' %}" alt="Cloudy" class="w-10 h-10">
+        Low proability of rain
       {% else %}
         <img src="{% static 'img/imgmeteo/sun.png' %}" alt="Sun" class="w-10 h-10">
+        Sunny
       {% endif %}
        <p class="text-lg font-bold">{{ day.Precipitation_mm }} mm</p>
-      <div class="flex space-between gap-6">
-        <div class="gap-6">
+      <div class="flex space-between gap-24">
+        <div class="">
           
           <h2 class="text-2xl font-semibold">{{ ville }}</h2> 
 
         </div>
-        <h1 class="text-3xl font-bold mt-2">{{ day.Probabilite_Max }}%</h1>
+        <h1 class="text-3xl font-bold">{{ day.Probabilite_Max }}%</h1>
       </div>
       
     </div>
@@ -84,12 +83,19 @@
             </div>
          {% endfor %}
         {% else %}
-        <p class="text-white">Aucune donnée météo disponible</p>
+        <p class="text-white">No weather data available</p>
         {% endif %}
      </div>
     </div>
+    
   </div>
 
+<div>
+     <p class=" text-lg  font-bold pb-2">{{ message }}</p>
+    <div class="carte">
+      {{ carte|safe }}
+    </div>
+  </div>
 <!-- CONTENEUR DASHBOARD EN DESSOUS -->
 
 

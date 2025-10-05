@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
+
 from requests import request
 # Create your views here.
 
@@ -134,6 +135,9 @@ def home(request):
         'temperature_actuelle': temperature_actuelle,  # ✅ Température actuelle
         'condition_actuelle': condition_actuelle,  # ✅ Condition météo actuelle
     })
+
+from datetime import date
+from meteo_app import get_weekly_precipitation
 
 def dashboard(request):
     jour = request.GET.get('date')
