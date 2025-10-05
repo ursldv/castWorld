@@ -13,3 +13,4 @@ pandas==2.3.3
 reportlab==4.4.4
 matplotlib==3.10.6
 gunicorn==21.2.0
+folium==0.16.0  # ou la version que tu utilises localement
