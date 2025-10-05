@@ -12,3 +12,4 @@ geocoder==1.38.1
 pandas==2.3.3
 reportlab==4.4.4
 matplotlib==3.10.6
+gunicorn==21.2.0
