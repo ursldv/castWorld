@@ -1,6 +1,147 @@
 {% extends "layout/nav_bar.html" %}
 
-{% block title %}Accueil - WorldCast{% endblock %}
+{% block title %}Dashboard - WorldCast{% endblock %}
 
 {% block content %}
-{% endblock%}
+
+<!-- DASHBOARD CONTAINER -->
+<div class="mt-8 p-6 bg-gray-100 rounded-2xl shadow">
+
+  <!-- HEADER -->
+  <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4 md:mb-0">Average Values</h2>
+    <a href="{% url 'download_pdf' %}" 
+   class="bg-[#409ac7] text-white px-4 py-2 rounded-md">
+   Download PDF
+</a>
+
+  </div>
+
+  <!-- VALUE CARDS -->
+  <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+    
+    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
+      <i class="fas fa-temperature-high text-3xl text-red-500 mb-2"></i>
+      <p class="text-gray-500 text-sm">Temperature</p>
+      <h3 class="text-2xl font-bold">28°C</h3>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
+      <i class="fas fa-tint text-3xl text-blue-500 mb-2"></i>
+      <p class="text-gray-500 text-sm">Humidity</p>
+      <h3 class="text-2xl font-bold">65%</h3>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
+      <i class="fas fa-wind text-3xl text-green-500 mb-2"></i>
+      <p class="text-gray-500 text-sm">Wind Speed</p>
+      <h3 class="text-2xl font-bold">12 km/h</h3>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl shadow flex flex-col items-center">
+      <i class="fas fa-cloud-showers-heavy text-3xl text-indigo-500 mb-2"></i>
+      <p class="text-gray-500 text-sm">Precipitation</p>
+      <h3 class="text-2xl font-bold">5 mm</h3>
+    </div>
+  </div>
+
+  <!-- GRAPH SECTION -->
+  <h2 class="text-xl font-semibold mb-4 text-gray-800">Weekly Evolution</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+    <!-- Temperature Chart -->
+    <div class="bg-white p-4 rounded-xl shadow">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800">Temperature</h3>
+      <canvas id="temperatureChart"></canvas>
+      <p class="text-gray-600 text-sm mt-3">
+        The temperature chart shows the daily average temperature trend throughout the week.
+      </p>
+    </div>
+
+    <!-- Humidity Chart -->
+    <div class="bg-white p-4 rounded-xl shadow">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800">Humidity</h3>
+      <canvas id="humidityChart"></canvas>
+      <p class="text-gray-600 text-sm mt-3">
+        This graph represents the variation of humidity levels, indicating moisture concentration in the air.
+      </p>
+    </div>
+
+    <!-- Wind Speed Chart -->
+    <div class="bg-white p-4 rounded-xl shadow">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800">Wind Speed</h3>
+      <canvas id="windChart"></canvas>
+      <p class="text-gray-600 text-sm mt-3">
+        This chart shows how wind speed changes over the week, providing insights into windy conditions.
+      </p>
+    </div>
+
+    <!-- Precipitation Chart -->
+    <div class="bg-white p-4 rounded-xl shadow">
+      <h3 class="text-lg font-semibold mb-4 text-gray-800">Precipitation</h3>
+      <canvas id="precipitationChart"></canvas>
+      <p class="text-gray-600 text-sm mt-3">
+        The precipitation chart shows rainfall intensity throughout the week, measured in millimeters.
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- CHART.JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  const charts = [];
+
+  // Create reusable chart builder
+  function createChart(id, label, data, borderColor, bgColor) {
+    const ctx = document.getElementById(id);
+    const chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: days,
+        datasets: [{
+          label: label,
+          data: data,
+          borderColor: borderColor,
+          backgroundColor: bgColor,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: true } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+    charts.push(chart);
+    return chart;
+  }
+
+  // Create charts
+  createChart("temperatureChart", "Temperature (°C)", [28, 30, 27, 29, 31, 26, 28], "#ef4444", "rgba(239,68,68,0.2)");
+  createChart("humidityChart", "Humidity (%)", [60, 65, 63, 70, 68, 72, 66], "#3b82f6", "rgba(59,130,246,0.2)");
+  createChart("windChart", "Wind Speed (km/h)", [10, 12, 9, 11, 13, 8, 12], "#10b981", "rgba(16,185,129,0.2)");
+  createChart("precipitationChart", "Precipitation (mm)", [4, 6, 5, 3, 7, 2, 5], "#6366f1", "rgba(99,102,241,0.2)");
+
+  // Download button logic
+  document.getElementById("downloadCharts").addEventListener("click", () => {
+    charts.forEach((chart, index) => {
+      const link = document.createElement("a");
+      link.download = `${chart.canvas.id}.png`;
+      link.href = chart.toBase64Image("image/png", 1);
+      link.click();
+    });
+  });
+});
+</script>
+
+{% endblock %}
