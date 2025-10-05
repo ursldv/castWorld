@@ -138,15 +138,72 @@ def map_view(request):
         'lieu': lieu,
         'jour': jour,
     })
-
+import pandas as pd
 def suggestions(request):
     jour = get_date_from_request(request)
     lieu = get_lieu_from_request(request)
+
+    geolocator = Nominatim(user_agent="meteo_app")
+    if lieu:
+        location = geolocator.geocode(lieu)
+        if location:
+            lat, lon = location.latitude, location.longitude
+        else:
+            lat, lon = 6.3703, 2.3912  # Cotonou par défaut
+    else:
+        lat, lon = 6.3703, 2.3912
+
+    df = get_weekly_precipitation(lat, lon, jour)
+
+    risque_inondation = "Données insuffisantes"
+    recommandation = "Impossible de formuler une recommandation sans données fiables."
+    message = ""
+
+    if df is not None and not df.empty:
+        avg_precip = df.get("Precipitation_mm", pd.Series([0])).mean()
+        avg_temp = df.get("Temperature_Max", pd.Series([28])).mean()  # Valeur par défaut si pas de colonne
+
+        if avg_precip >= 100:
+            risque_inondation = " Risque d’inondation critique"
+            recommandation = (
+                "Quittez les zones inondables si possible. "
+                "Protégez vos documents importants et coupez l’électricité en cas de montée d’eau."
+            )
+        elif avg_precip >= 70:
+            risque_inondation = "⚠️ Risque d’inondation élevé"
+            recommandation = (
+                "Restez vigilants. Surélevez vos biens, évitez les déplacements en soirée, "
+                "et tenez-vous informés des alertes locales."
+            )
+        elif avg_precip >= 40:
+            risque_inondation = " Risque modéré d’inondation"
+            recommandation = (
+                "Nettoyez les caniveaux, évitez d’obstruer les voies d’écoulement, "
+                "et préparez un kit d’urgence si vous vivez en zone basse."
+            )
+        else:
+            risque_inondation = " Faible risque d’inondation"
+            recommandation = (
+                "Aucune alerte majeure, mais restez prudents. "
+                "Les sols peuvent encore être humides si des pluies récentes ont eu lieu."
+            )
+
+        if avg_temp > 35 and avg_precip > 40:
+            recommandation += " La chaleur pourrait intensifier le ruissellement, soyez attentif."
+
+        dernier_jour = df['Date'].iloc[-1] if 'Date' in df.columns else jour
+        message = f"Données analysées pour {lieu or 'Cotonou'} du {jour} au {dernier_jour}."
+    else:
+        message = " Données météo indisponibles pour ce lieu ou cette période."
+
     return render(request, 'pages/suggestions.html', {
-        'date': jour,
-        'lieu': lieu,
         'jour': jour,
+        'lieu': lieu,
+        'message': message,
+        'risque_inondation': risque_inondation,
+        'recommandation': recommandation,
     })
+
 
 def contact(request):
     jour = get_date_from_request(request)
