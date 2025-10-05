@@ -182,17 +182,17 @@ def suggestions(request):
                 "et préparez un kit d’urgence si vous vivez en zone basse."
             )
         else:
-            risque_inondation = " Faible risque d’inondation"
+            risque_inondation = " Low flood risk"
             recommandation = (
-                "Aucune alerte majeure, mais restez prudents. "
-                "Les sols peuvent encore être humides si des pluies récentes ont eu lieu."
+                "No major alerts, but stay cautious. The ground may still be wet if there has been recent rainfall"
             )
+            
 
         if avg_temp > 35 and avg_precip > 40:
             recommandation += " La chaleur pourrait intensifier le ruissellement, soyez attentif."
 
         dernier_jour = df['Date'].iloc[-1] if 'Date' in df.columns else jour
-        message = f"Données analysées pour {lieu or 'Cotonou'} du {jour} au {dernier_jour}."
+        message = f"Data analyzed for {lieu or 'Cotonou'} du {jour} at {dernier_jour}."
     else:
         message = " Données météo indisponibles pour ce lieu ou cette période."
 
