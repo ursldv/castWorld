@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-(ucoo#$(+bjb8bi7jx(fvl15&#lvlzjx9jsl3pwbm4fm&@-qe4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["castworld.onrender.com", '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['castworld-tq14.onrender.com',"castworld.onrender.com", '127.0.0.1', 'localhost']
 
 
 # Application definition
